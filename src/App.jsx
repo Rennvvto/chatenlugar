@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import CampaignWorkspace from './CampaignWorkspace'
 import ProfileView from './ProfileView'
 import { clearLocalSession, getLocalSession, loginLocalUser, registerLocalUser } from './local-auth'
+import logoMark from './assets/chatenlugar-logo.png'
 
 const campaigns = [
   {
@@ -52,8 +53,8 @@ const steps = [
   {
     number: '02',
     icon: 'letters',
-    title: 'Participa por letras',
-    text: 'Conversa y aporta para avanzar junto a la comunidad.',
+    title: 'Trabaja por letras',
+    text: 'Desarrolla tu turno y registra avances junto al equipo.',
   },
   {
     number: '03',
@@ -146,7 +147,7 @@ function Modal({ mode, campaign, onClose, onAuthenticated }) {
         <button className="icon-button modal-close" type="button" aria-label="Cerrar" onClick={onClose}>
           <Icon name="close" />
         </button>
-        <div className="modal-badge"><Icon name={isPrint ? 'print' : 'sparkle'} size={18} /></div>
+        <div className="modal-badge"><Icon name={isPrint ? 'print' : 'cards'} size={18} /></div>
         <h2 id="modal-title">{title}</h2>
         {isPrint ? (
           <>
@@ -216,7 +217,7 @@ export default function App() {
   return (
     <main className="site-shell">
       <header className="site-header container">
-        <a className="brand" href="#inicio" aria-label="chatenlugar, inicio">chatenlugar</a>
+        <a className="brand" href="#inicio" aria-label="chatenlugar, inicio"><img src={logoMark} alt="" /> <span>chatenlugar</span></a>
         <button className="mobile-toggle" type="button" aria-label="Abrir menú" onClick={() => setMobileOpen((open) => !open)}><Icon name="menu" /></button>
         <nav className={mobileOpen ? 'primary-nav open' : 'primary-nav'} aria-label="Navegación principal">
           <a href="#diccionario" onClick={() => setMobileOpen(false)}>Diccionario</a>
@@ -236,26 +237,26 @@ export default function App() {
       <section id="inicio" className="hero container">
         <div className="hero-copy">
           <p className="eyebrow">DICCIONARIO DE CAMPAÑAS</p>
-          <h1>Participa en campañas<br />por turnos.</h1>
-          <p className="hero-description">Encuentra una campaña y recorre sus letras a tu ritmo, desde el diccionario.</p>
-          <div className={`search-experience ${searchFocused ? 'is-active' : ''}`} id="diccionario">
-            <p className="search-kicker"><Icon name="sparkle" size={15} /> Explora el diccionario</p>
-            <form className="search-bar" onSubmit={(event) => { event.preventDefault(); setSearchFocused(false); document.getElementById('campanas')?.scrollIntoView({ behavior: 'smooth' }) }}>
-              <span className="search-symbol"><Icon name="search" size={21} /></span>
-              <input value={query} onFocus={() => setSearchFocused(true)} onBlur={() => window.setTimeout(() => setSearchFocused(false), 140)} onChange={(event) => setQuery(event.target.value)} placeholder="Busca una campaña" aria-label="Busca una campaña" />
-              {query && <button className="search-clear" type="button" aria-label="Limpiar búsqueda" onMouseDown={(event) => event.preventDefault()} onClick={() => setQuery('')}><Icon name="close" size={16} /></button>}
-              <button className="search-submit" type="submit" aria-label="Ver campañas"><span>Ver campañas</span><i><Icon name="arrow" size={20} /></i></button>
-            </form>
-            <div className="search-suggestions" aria-label="Campañas sugeridas">
-              {filteredCampaigns.length ? <><span>{query ? 'Resultados disponibles' : 'Campañas sugeridas'}</span><div>{filteredCampaigns.map((campaign) => <button key={campaign.id} type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => useSuggestion(campaign)}>{campaign.name}</button>)}</div></> : <span>No encontramos esa campaña. Prueba con HOLA, Sushi, Pizza o Hamburguesas.</span>}
-            </div>
-          </div>
+          <h1>Trabaja en campañas<br />por turnos.</h1>
+          <p className="hero-description">Encuentra una campaña de trabajo y avanza por letras según tu turno asignado.</p>
         </div>
         <div className="hero-route" aria-label="Recorrido de letras de una campaña">
-          <p>PARTICIPA<br />POR LETRAS</p>
+          <p>TRABAJA<br />POR LETRAS</p>
           <div className="route-line" />
           {['H', 'O', 'L', 'A'].map((letter, index) => <div className={`letter-tile tile-${index}`} key={letter}>{letter}</div>)}
           <div className="hero-ticket"><span>TURNO</span><strong>5.000</strong></div>
+        </div>
+        <div className={`search-experience hero-search ${searchFocused ? 'is-active' : ''}`} id="diccionario">
+          <p className="search-kicker">Explora el diccionario</p>
+          <form className="search-bar" onSubmit={(event) => { event.preventDefault(); setSearchFocused(false); document.getElementById('campanas')?.scrollIntoView({ behavior: 'smooth' }) }}>
+            <span className="search-symbol"><Icon name="search" size={21} /></span>
+            <input value={query} onFocus={() => setSearchFocused(true)} onBlur={() => window.setTimeout(() => setSearchFocused(false), 140)} onChange={(event) => setQuery(event.target.value)} placeholder="Busca una campaña" aria-label="Busca una campaña" />
+            {query && <button className="search-clear" type="button" aria-label="Limpiar búsqueda" onMouseDown={(event) => event.preventDefault()} onClick={() => setQuery('')}><Icon name="close" size={16} /></button>}
+            <button className="search-submit" type="submit" aria-label="Ver campañas"><span>Ver campañas</span><i><Icon name="arrow" size={20} /></i></button>
+          </form>
+          <div className="search-suggestions" aria-label="Campañas sugeridas">
+            {filteredCampaigns.length ? <><span>{query ? 'Resultados disponibles' : 'Campañas sugeridas'}</span><div>{filteredCampaigns.map((campaign) => <button key={campaign.id} type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => useSuggestion(campaign)}>{campaign.name}</button>)}</div></> : <span>No encontramos esa campaña. Prueba con HOLA, Sushi, Pizza o Hamburguesas.</span>}
+          </div>
         </div>
       </section>
 
@@ -304,9 +305,9 @@ export default function App() {
             <div className="turn-ticket"><span>Tu turno</span><strong>{selected.turn}</strong></div>
           </article>
           <article className="conversation-card">
-            <div className="conversation-title"><Icon name="chat" size={19} /><span>Actividad de la sala</span><time>Actualizado</time></div>
-            <p>Revisa los aportes y comentarios recientes de la campaña antes de participar.</p>
-            <button type="button" className="mini-action" onClick={() => setModal('signup')}>Participar</button>
+            <div className="conversation-title"><Icon name="chat" size={19} /><span>Actividad de trabajo</span><time>Actualizado</time></div>
+            <p>Revisa las actualizaciones recientes de la campaña antes de comenzar tu turno.</p>
+            <button type="button" className="mini-action" onClick={() => setModal('signup')}>Comenzar a trabajar</button>
           </article>
           <article className="ad-card">
             <span>PUBLICIDAD</span>
@@ -322,7 +323,7 @@ export default function App() {
         <span className="dispatch-note">Despacho: hasta 15 días</span>
       </section>
 
-      <footer className="site-footer container"><strong>chatenlugar</strong><span>Campañas, conversaciones y colecciones.</span><div><a href="#inicio">Centro de ayuda</a><a href="#inicio">Términos</a><a href="#inicio">Privacidad</a></div></footer>
+      <footer className="site-footer container"><strong className="footer-brand"><img src={logoMark} alt="" /> <span>chatenlugar</span></strong><span>Campañas, trabajo y colecciones.</span><div><a href="#inicio">Centro de ayuda</a><a href="#inicio">Términos</a><a href="#inicio">Privacidad</a></div></footer>
 
       <Modal mode={modal} campaign={selected} onClose={() => setModal(null)} onAuthenticated={setSession} />
     </main>

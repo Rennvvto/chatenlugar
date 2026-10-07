@@ -53,7 +53,7 @@ export const registerLocalUser = async ({ name, email, password }) => {
     name: cleanName,
     email: cleanEmail,
     handle: createHandle(cleanName, accounts),
-    bio: 'Participante de campañas en chatenlugar.',
+    bio: 'Trabajador de campañas en chatenlugar.',
     location: 'Chile',
     joinedAt: new Date().toISOString(),
     passwordHash: await hashPassword(password),

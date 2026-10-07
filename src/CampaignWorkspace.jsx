@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './campaign-workspace.css'
 import { getLocalSession } from './local-auth'
+import logoMark from './assets/chatenlugar-logo.png'
 
 const sequence = ['S', 'U', 'S', 'H', 'I']
 
@@ -57,7 +58,7 @@ export default function CampaignWorkspace() {
   const [message, setMessage] = useState('')
   const [productIndex, setProductIndex] = useState(0)
   const [carouselPaused, setCarouselPaused] = useState(false)
-  const [participating, setParticipating] = useState(false)
+  const [working, setWorking] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [theme, setTheme] = useState(() => window.localStorage.getItem('chatenlugar-theme') || 'day')
   const user = getLocalSession()?.user
@@ -96,7 +97,7 @@ export default function CampaignWorkspace() {
     <main className="workspace-shell">
       <section className="workspace-frame" aria-label="Espacio de campaña SUSHI">
         <header className="workspace-topbar">
-          <a href="/" className="workspace-brand" aria-label="chatenlugar, inicio">chatenlugar</a>
+          <a href="/" className="workspace-brand" aria-label="chatenlugar, inicio"><img src={logoMark} alt="" /><span>chatenlugar</span></a>
           <div className="workspace-top-actions">
             <button className="workspace-icon-button workspace-theme" type="button" onClick={() => setTheme((current) => current === 'day' ? 'night' : 'day')} aria-label={theme === 'day' ? 'Activar modo noche' : 'Activar modo día'}><Icon name={theme === 'day' ? 'moon' : 'sun'} size={19} /></button>
             <button className="workspace-icon-button" type="button" aria-label="Buscar"><Icon name="search" size={21} /></button>
@@ -109,7 +110,7 @@ export default function CampaignWorkspace() {
         <aside className={mobileMenuOpen ? 'workspace-sidebar open' : 'workspace-sidebar'} aria-label="Navegación de usuario">
           <nav>
             {[
-              ['campaign', 'Campañas'], ['community', 'Comunidad'], ['compass', 'Explorar'], ['bag', 'Tienda'], ['user', 'Mi perfil'],
+              ['campaign', 'Campañas'], ['community', 'Equipo'], ['compass', 'Explorar'], ['bag', 'Tienda'], ['user', 'Mi perfil'],
             ].map(([icon, label], index) => index === 4 ? <a key={label} className="sidebar-link" href="/perfil"><Icon name={icon} size={21} /><span>{label}</span></a> : <button key={label} className={index === 0 ? 'sidebar-link active' : 'sidebar-link'} type="button" onClick={() => setMobileMenuOpen(false)}><Icon name={icon} size={21} /><span>{label}</span></button>)}
           </nav>
           <div className="sidebar-footer"><span className="sidebar-live-dot" />Campaña activa</div>
@@ -123,23 +124,23 @@ export default function CampaignWorkspace() {
               <ol aria-label="Secuencia de letras de SUSHI">{sequence.map((letter, index) => <li className={index === 0 ? 'active' : ''} key={`${letter}-${index}`}>{letter}</li>)}</ol>
             </div>
             <div className="campaign-next"><span>Siguiente letra</span><strong>U <Icon name="chevron" size={18} /></strong></div>
-            <button className={participating ? 'participate-button is-participating' : 'participate-button'} type="button" onClick={() => setParticipating((current) => !current)}>{participating ? 'Participando' : 'Participar'} <Icon name="chevron" size={20} /></button>
+            <button className={working ? 'participate-button is-participating' : 'participate-button'} type="button" onClick={() => setWorking((current) => !current)}>{working ? 'En jornada' : 'Trabajar ahora'} <Icon name="chevron" size={20} /></button>
           </header>
 
           <section className="conversation-panel" aria-labelledby="conversation-title">
-            <div className="conversation-heading"><h2 id="conversation-title">Conversación</h2><button type="button">Más recientes <Icon name="chevron" size={15} /></button></div>
+            <div className="conversation-heading"><h2 id="conversation-title">Actualizaciones de trabajo</h2><button type="button">Más recientes <Icon name="chevron" size={15} /></button></div>
             <div className="post-list" aria-live="polite">
               {posts.map((post) => (
                 <article className="conversation-post" key={post.id}>
                   <div className={`post-avatar ${post.tone}`}>{post.initials}</div>
                   <div className="post-content"><div><strong>{post.author}</strong><time>{post.time}</time></div><p>{post.text}</p><button type="button" className="reply-button">Responder</button></div>
-                  <div className="post-actions"><button className={post.liked ? 'like-button liked' : 'like-button'} type="button" aria-pressed={post.liked} onClick={() => toggleLike(post.id)}><Icon name="heart" size={18} /> {post.likes}</button><button className="more-button" type="button" aria-label={`Más opciones para el aporte de ${post.author}`}><Icon name="more" size={20} /></button></div>
+                  <div className="post-actions"><button className={post.liked ? 'like-button liked' : 'like-button'} type="button" aria-pressed={post.liked} onClick={() => toggleLike(post.id)}><Icon name="heart" size={18} /> {post.likes}</button><button className="more-button" type="button" aria-label={`Más opciones para la actualización de ${post.author}`}><Icon name="more" size={20} /></button></div>
                 </article>
               ))}
             </div>
             <form className="message-composer" onSubmit={publishMessage}>
               <div className="post-avatar own">R</div>
-              <div className="composer-box"><textarea value={message} maxLength={500} onChange={(event) => setMessage(event.target.value)} placeholder="Escribe tu aporte…" aria-label="Escribe tu aporte" /><div><span><button type="button" aria-label="Adjuntar imagen"><Icon name="image" size={20} /></button><button type="button" aria-label="Agregar reacción"><Icon name="smile" size={20} /></button><button type="button" aria-label="Agregar enlace"><Icon name="link" size={20} /></button></span><small>{message.length}/500</small><button className="publish-button" type="submit">Publicar</button></div></div>
+              <div className="composer-box"><textarea value={message} maxLength={500} onChange={(event) => setMessage(event.target.value)} placeholder="Registra tu actualización…" aria-label="Registra tu actualización" /><div><span><button type="button" aria-label="Adjuntar imagen"><Icon name="image" size={20} /></button><button type="button" aria-label="Agregar reacción"><Icon name="smile" size={20} /></button><button type="button" aria-label="Agregar enlace"><Icon name="link" size={20} /></button></span><small>{message.length}/500</small><button className="publish-button" type="submit">Enviar actualización</button></div></div>
             </form>
           </section>
 
