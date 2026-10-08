@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import CampaignWorkspace from './CampaignWorkspace'
 import ProfileView from './ProfileView'
+import PlatformHub from './PlatformHub'
 import { clearSession, getCachedSession, login, register, restoreSession } from './platform-api'
 import logoMark from './assets/chatenlugar-logo.png'
 
@@ -172,6 +173,7 @@ function Modal({ mode, campaign, onClose, onAuthenticated }) {
 export default function App() {
   if (window.location.pathname.startsWith('/campania')) return <CampaignWorkspace />
   if (window.location.pathname.startsWith('/perfil')) return <ProfileView />
+  if (/^\/(campanias|explorar|comunidad|tienda|colecciones)/.test(window.location.pathname)) return <PlatformHub />
 
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState('hola')
@@ -223,7 +225,7 @@ export default function App() {
   const selectCampaign = (campaign) => {
     setSelectedId(campaign.id)
     setQuery('')
-    document.getElementById('actividad')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    window.location.assign(`/campania/${campaign.id}`)
   }
 
   const useSuggestion = (campaign) => {
@@ -238,9 +240,9 @@ export default function App() {
         <a className="brand" href="#inicio" aria-label="chatenlugar, inicio"><img src={logoMark} alt="" /> <span>chatenlugar</span></a>
         <button className="mobile-toggle" type="button" aria-label="Abrir menú" onClick={() => setMobileOpen((open) => !open)}><Icon name="menu" /></button>
         <nav className={mobileOpen ? 'primary-nav open' : 'primary-nav'} aria-label="Navegación principal">
-          <a href="#diccionario" onClick={() => setMobileOpen(false)}>Diccionario</a>
-          <a href="#campanas" onClick={() => setMobileOpen(false)}>Campañas</a>
-          <a href="#coleccion" onClick={() => setMobileOpen(false)}>Colecciones</a>
+          <a href="/explorar" onClick={() => setMobileOpen(false)}>Diccionario</a>
+          <a href="/campanias" onClick={() => setMobileOpen(false)}>Campañas</a>
+          <a href="/colecciones" onClick={() => setMobileOpen(false)}>Colecciones</a>
           <a href="#como-funciona" onClick={() => setMobileOpen(false)}>Cómo funciona</a>
         </nav>
         <div className="header-actions">
@@ -266,7 +268,7 @@ export default function App() {
         </div>
         <div className={`search-experience hero-search ${searchFocused ? 'is-active' : ''}`} id="diccionario">
           <p className="search-kicker">Explora el diccionario</p>
-          <form className="search-bar" onSubmit={(event) => { event.preventDefault(); setSearchFocused(false); document.getElementById('campanas')?.scrollIntoView({ behavior: 'smooth' }) }}>
+          <form className="search-bar" onSubmit={(event) => { event.preventDefault(); setSearchFocused(false); window.location.assign(`/explorar?q=${encodeURIComponent(query.trim())}`) }}>
             <span className="search-symbol"><Icon name="search" size={21} /></span>
             <input value={query} onFocus={() => setSearchFocused(true)} onBlur={() => window.setTimeout(() => setSearchFocused(false), 140)} onChange={(event) => setQuery(event.target.value)} placeholder="Busca una campaña" aria-label="Busca una campaña" />
             {query && <button className="search-clear" type="button" aria-label="Limpiar búsqueda" onMouseDown={(event) => event.preventDefault()} onClick={() => setQuery('')}><Icon name="close" size={16} /></button>}

@@ -111,7 +111,7 @@ export default function CampaignWorkspace() {
           <nav>
             {[
               ['campaign', 'Campañas'], ['community', 'Equipo'], ['compass', 'Explorar'], ['bag', 'Tienda'], ['user', 'Mi perfil'],
-            ].map(([icon, label], index) => index === 4 ? <a key={label} className="sidebar-link" href="/perfil"><Icon name={icon} size={21} /><span>{label}</span></a> : <button key={label} className={index === 0 ? 'sidebar-link active' : 'sidebar-link'} type="button" onClick={() => setMobileMenuOpen(false)}><Icon name={icon} size={21} /><span>{label}</span></button>)}
+            ].map(([icon, label], index) => <a key={label} className={index === 0 ? 'sidebar-link active' : 'sidebar-link'} href={['/campanias', '/comunidad', '/explorar', '/tienda', '/perfil'][index]} onClick={() => setMobileMenuOpen(false)}><Icon name={icon} size={21} /><span>{label}</span></a>)}
           </nav>
           <div className="sidebar-footer"><span className="sidebar-live-dot" />Campaña activa</div>
         </aside>

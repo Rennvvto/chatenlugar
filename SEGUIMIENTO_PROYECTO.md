@@ -6,8 +6,9 @@
 | --- | --- | --- |
 | 1. Base fullstack y visual | Integrada | PR #1 fusionado en `main` (`b931b42`) |
 | 2. Railway y PostgreSQL | Integrada y desplegada | PR #2 fusionado en `main` (`c233a3e`); API pública activa |
-| 3. React con API real | En curso | Rama `phase-3-react-api` |
-| 4 a 10 | Pendientes | Se ejecutarán como fases y PR independientes |
+| 3. React con API real | Integrada | PR #3 fusionado en `main` (`f8bb70f`) |
+| 4. Navegación funcional | En curso | Rama `phase-4-navigation` |
+| 5 a 10 | Pendientes | Se ejecutarán como fases y PR independientes |
 
 ## Despliegue actual
 
@@ -17,4 +18,4 @@
 
 ## Próxima acción
 
-Completar autenticación y perfil de React contra la API, verificar persistencia de sesión y abrir el PR de la Fase 3.
+Completar las rutas de navegación, búsqueda real y enlaces de interfaz; luego abrir el PR de la Fase 4.
