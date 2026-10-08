@@ -145,8 +145,27 @@ CREATE TABLE IF NOT EXISTS order_items (
   unit_price_cents INTEGER NOT NULL CHECK (unit_price_cents >= 0)
 );
 
+CREATE TABLE IF NOT EXISTS business_rules (
+  key VARCHAR(80) PRIMARY KEY,
+  value JSONB NOT NULL DEFAULT '{}'::jsonb,
+  is_active BOOLEAN NOT NULL DEFAULT FALSE,
+  updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS admin_audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  actor_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  action VARCHAR(100) NOT NULL,
+  entity_type VARCHAR(50) NOT NULL,
+  entity_id VARCHAR(100),
+  details JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX IF NOT EXISTS campaigns_search_idx ON campaigns USING GIN (to_tsvector('spanish', name || ' ' || short_description));
 CREATE INDEX IF NOT EXISTS notifications_user_created_idx ON notifications (user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS work_updates_campaign_created_idx ON work_updates (campaign_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS work_update_comments_update_created_idx ON work_update_comments (work_update_id, created_at ASC);
 CREATE INDEX IF NOT EXISTS orders_user_created_idx ON orders (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS admin_audit_logs_actor_created_idx ON admin_audit_logs (actor_id, created_at DESC);
