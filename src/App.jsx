@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import CampaignWorkspace from './CampaignWorkspace'
 import ProfileView from './ProfileView'
 import PlatformHub from './PlatformHub'
+import NotificationCenter from './NotificationCenter'
 import { clearSession, getCachedSession, login, register, restoreSession } from './platform-api'
 import logoMark from './assets/chatenlugar-logo.png'
 
@@ -246,6 +247,7 @@ export default function App() {
           <a href="#como-funciona" onClick={() => setMobileOpen(false)}>Cómo funciona</a>
         </nav>
         <div className="header-actions">
+          <NotificationCenter />
           <button className="theme-toggle" type="button" onClick={() => setTheme((current) => current === 'day' ? 'night' : 'day')} aria-label={theme === 'day' ? 'Activar modo noche' : 'Activar modo día'} title={theme === 'day' ? 'Modo noche' : 'Modo día'}>
             <Icon name={theme === 'day' ? 'moon' : 'sun'} size={19} />
             <span>{theme === 'day' ? 'Noche' : 'Día'}</span>

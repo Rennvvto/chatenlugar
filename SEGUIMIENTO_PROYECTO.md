@@ -8,8 +8,9 @@
 | 2. Railway y PostgreSQL | Integrada y desplegada | PR #2 fusionado en `main` (`c233a3e`); API pública activa |
 | 3. React con API real | Integrada | PR #3 fusionado en `main` (`f8bb70f`) |
 | 4. Navegación funcional | Integrada | PR #4 fusionado en `main` (`6e6cdcb`) |
-| 5. Campañas y trabajo por turnos | En curso | Rama `phase-5-campaign-work` |
-| 6 a 10 | Pendientes | Se ejecutarán como fases y PR independientes |
+| 5. Campañas y trabajo por turnos | Integrada | PR #5 fusionado en `main` (`2d9fce8`) |
+| 6. Notificaciones | En curso | Rama `phase-6-notifications` |
+| 7 a 10 | Pendientes | Se ejecutarán como fases y PR independientes |
 
 ## Despliegue actual
 
@@ -19,4 +20,4 @@
 
 ## Próxima acción
 
-Desplegar y validar asignaciones, jornadas y actualizaciones de campaña; luego abrir el PR de la Fase 5.
+Conectar el centro de notificaciones al backend y comprobar el aislamiento por usuario antes de abrir el PR de la Fase 6.
