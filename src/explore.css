@@ -1,0 +1,7 @@
+.hub-explore-groups { display: grid; gap: 2rem; margin-top: 2.5rem; }
+.hub-explore-groups section > h2 { margin: 0 0 1rem; color: var(--ink, #16254a); font-size: 1.2rem; }
+.hub-mini-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; }
+.hub-mini-grid article { display: grid; gap: .35rem; min-height: 130px; padding: 1.25rem; border: 1px solid rgba(40, 84, 180, .18); border-radius: 18px; background: rgba(255,255,255,.78); box-shadow: 0 10px 25px rgba(13, 48, 119, .06); }
+.hub-mini-grid article span { color: #5370b0; font-size: .9rem; }
+.hub-mini-grid article p { margin: .15rem 0 0; color: #53627f; line-height: 1.45; }
+@media (prefers-color-scheme: dark) { .hub-explore-groups section > h2 { color: #edf3ff; } .hub-mini-grid article { background: rgba(18, 37, 76, .88); border-color: rgba(151, 181, 255, .2); } .hub-mini-grid article p { color: #bdc9df; } }

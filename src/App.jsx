@@ -3,6 +3,7 @@ import CampaignWorkspace from './CampaignWorkspace'
 import ProfileView from './ProfileView'
 import PlatformHub from './PlatformHub'
 import NotificationCenter from './NotificationCenter'
+import CommunityView from './CommunityView'
 import { clearSession, getCachedSession, login, register, restoreSession } from './platform-api'
 import logoMark from './assets/chatenlugar-logo.png'
 
@@ -174,6 +175,7 @@ function Modal({ mode, campaign, onClose, onAuthenticated }) {
 export default function App() {
   if (window.location.pathname.startsWith('/campania')) return <CampaignWorkspace />
   if (window.location.pathname.startsWith('/perfil')) return <ProfileView />
+  if (window.location.pathname.startsWith('/comunidad')) return <CommunityView />
   if (/^\/(campanias|explorar|comunidad|tienda|colecciones)/.test(window.location.pathname)) return <PlatformHub />
 
   const [query, setQuery] = useState('')

@@ -74,6 +74,23 @@ CREATE TABLE IF NOT EXISTS work_updates (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS work_update_comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  work_update_id UUID NOT NULL REFERENCES work_updates(id) ON DELETE CASCADE,
+  author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body VARCHAR(500) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS work_update_reactions (
+  work_update_id UUID NOT NULL REFERENCES work_updates(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  reaction_type VARCHAR(20) NOT NULL DEFAULT 'like' CHECK (reaction_type = 'like'),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (work_update_id, user_id, reaction_type)
+);
+
 CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -129,4 +146,5 @@ CREATE TABLE IF NOT EXISTS order_items (
 CREATE INDEX IF NOT EXISTS campaigns_search_idx ON campaigns USING GIN (to_tsvector('spanish', name || ' ' || short_description));
 CREATE INDEX IF NOT EXISTS notifications_user_created_idx ON notifications (user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS work_updates_campaign_created_idx ON work_updates (campaign_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS work_update_comments_update_created_idx ON work_update_comments (work_update_id, created_at ASC);
 CREATE INDEX IF NOT EXISTS orders_user_created_idx ON orders (user_id, created_at DESC);

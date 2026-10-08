@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { apiRequest } from './platform-api'
 import './platform-hub.css'
+import './explore.css'
 
 const sections = {
   campanias: { label: 'Campañas', eyebrow: 'ESPACIOS DE TRABAJO', title: 'Encuentra una campaña para trabajar.', copy: 'Revisa las campañas activas, su letra actual y el próximo turno disponible.', showCampaigns: true },
@@ -25,6 +26,7 @@ export default function PlatformHub() {
   const [section, setSection] = useState(currentSection)
   const [query, setQuery] = useState(() => new URLSearchParams(window.location.search).get('q') || '')
   const [campaigns, setCampaigns] = useState([])
+  const [explore, setExplore] = useState({ people: [], collections: [] })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const config = sections[section] || sections.campanias
@@ -40,15 +42,18 @@ export default function PlatformHub() {
     let active = true
     setLoading(true)
     setError('')
-    apiRequest(`/campaigns?q=${encodeURIComponent(query.trim())}`).then(({ campaigns: nextCampaigns }) => {
-      if (active) setCampaigns(nextCampaigns)
+    const endpoint = section === 'explorar' ? `/explore?q=${encodeURIComponent(query.trim())}` : `/campaigns?q=${encodeURIComponent(query.trim())}`
+    apiRequest(endpoint).then((data) => {
+      if (!active) return
+      setCampaigns(data.campaigns)
+      setExplore({ people: data.people || [], collections: data.collections || [] })
     }).catch((requestError) => {
       if (active) setError(requestError.message)
     }).finally(() => {
       if (active) setLoading(false)
     })
     return () => { active = false }
-  }, [config.showCampaigns, query])
+  }, [config.showCampaigns, query, section])
 
   const resultLabel = useMemo(() => query.trim() ? `Resultados para “${query.trim()}”` : 'Campañas activas', [query])
   const navigate = (target) => {
@@ -66,7 +71,8 @@ export default function PlatformHub() {
         {error && <p className="hub-state error">{error}</p>}
         {!error && loading && <p className="hub-state">Consultando campañas disponibles.</p>}
         {!error && !loading && !campaigns.length && <p className="hub-state">No encontramos campañas con ese nombre.</p>}
-        {!error && !loading && campaigns.length > 0 && <div className="hub-grid">{campaigns.map((campaign) => <article key={campaign.id} className="hub-campaign"><div><span>CAMPAÑA</span><h3>{campaign.name}</h3></div><p>{campaign.short_description}</p><dl><div><dt>Letra actual</dt><dd>{campaign.current_letter || 'Pendiente'}</dd></div><div><dt>Próximo turno</dt><dd>{campaign.next_turn.toLocaleString('es-CL')}</dd></div></dl><a href={`/campania/${campaign.slug}`}>Abrir campaña <Icon name="arrow" /></a></article>)}</div>}
+        {!error && !loading && campaigns.length > 0 && <div className="hub-grid">{campaigns.map((campaign) => <article key={campaign.id || campaign.slug} className="hub-campaign"><div><span>CAMPAÑA</span><h3>{campaign.name}</h3></div><p>{campaign.short_description || campaign.description}</p><dl><div><dt>Letra actual</dt><dd>{campaign.current_letter || 'Disponible'}</dd></div><div><dt>Próximo turno</dt><dd>{campaign.next_turn?.toLocaleString('es-CL') || 'Consulta campaña'}</dd></div></dl><a href={`/campania/${campaign.slug}`}>Abrir campaña <Icon name="arrow" /></a></article>)}</div>}
+        {!error && !loading && section === 'explorar' && <div className="hub-explore-groups"><section><h2>Personas</h2>{explore.people.length ? <div className="hub-mini-grid">{explore.people.map((person) => <article key={person.handle}><strong>{person.name}</strong><span>@{person.handle}</span><p>{person.bio || 'Sin descripción pública.'}</p></article>)}</div> : <p className="hub-state">No encontramos personas con ese criterio.</p>}</section><section><h2>Colecciones</h2>{explore.collections.length ? <div className="hub-mini-grid">{explore.collections.map((collection) => <article key={collection.id}><strong>{collection.name}</strong><span>por @{collection.owner_handle}</span><p>{collection.description || 'Sin descripción pública.'}</p></article>)}</div> : <p className="hub-state">No hay colecciones públicas que mostrar.</p>}</section></div>}
       </> : <div className="hub-empty"><Icon name="campaign" /><h2>{config.empty}</h2><p>Mientras habilitamos este módulo, puedes revisar las campañas que ya están disponibles.</p><a href="/campanias">Ver campañas <Icon name="arrow" /></a></div>}
     </section>
   </main>

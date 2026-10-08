@@ -7,6 +7,8 @@ import authRoutes from './routes/auth.js'
 import userRoutes from './routes/users.js'
 import campaignRoutes from './routes/campaigns.js'
 import notificationRoutes from './routes/notifications.js'
+import communityRoutes from './routes/community.js'
+import exploreRoutes from './routes/explore.js'
 import { errorHandler, notFound } from './middleware/errors.js'
 
 const app = express()
@@ -17,7 +19,7 @@ app.use(cors({
     if (!origin || config.clientOrigins.includes(origin)) return callback(null, true)
     return callback(new Error('Origen no permitido por CORS.'))
   },
-  methods: ['GET', 'POST', 'PATCH'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 app.use(express.json({ limit: '1mb' }))
@@ -36,6 +38,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/campaigns', campaignRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/community', communityRoutes)
+app.use('/api/explore', exploreRoutes)
 app.use(notFound)
 app.use(errorHandler)
 

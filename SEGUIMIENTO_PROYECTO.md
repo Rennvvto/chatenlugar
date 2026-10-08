@@ -9,8 +9,9 @@
 | 3. React con API real | Integrada | PR #3 fusionado en `main` (`f8bb70f`) |
 | 4. Navegación funcional | Integrada | PR #4 fusionado en `main` (`6e6cdcb`) |
 | 5. Campañas y trabajo por turnos | Integrada | PR #5 fusionado en `main` (`2d9fce8`) |
-| 6. Notificaciones | En curso | Rama `phase-6-notifications` |
-| 7 a 10 | Pendientes | Se ejecutarán como fases y PR independientes |
+| 6. Notificaciones | Integrada | PR #6 fusionado en `main` (`74b0eb2`) |
+| 7. Comunidad y explorar | En revisión | PR #7; commits `ebafe13`, `30fcbee`; despliegue Railway `53090d35` exitoso |
+| 8 a 10 | Pendientes | Se ejecutarán como fases y PR independientes |
 
 ## Despliegue actual
 
@@ -20,4 +21,4 @@
 
 ## Próxima acción
 
-Conectar el centro de notificaciones al backend y comprobar el aislamiento por usuario antes de abrir el PR de la Fase 6.
+Revisar y fusionar el PR #7; luego iniciar la Fase 8 en una rama nueva desde `main`.
