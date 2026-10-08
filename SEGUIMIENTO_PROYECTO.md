@@ -7,12 +7,12 @@
 | 1. Base fullstack y visual | Integrada | PR #1 fusionado en `main` (`b931b42`) |
 | 2. Railway y PostgreSQL | Integrada y desplegada | PR #2 fusionado en `main` (`c233a3e`) |
 | 3. React con API real | Integrada | PR #3 fusionado en `main` (`f8bb70f`) |
-| 4. Navegación funcional | Integrada | PR #4 fusionado en `main` (`6e6cdcb`) |
+| 4. Navegación funcional | Integrada y completada | PR #4 y corrección de Colecciones en PR #12 fusionados en `main` |
 | 5. Campañas y trabajo por turnos | Integrada | PR #5 fusionado en `main` (`2d9fce8`) |
 | 6. Notificaciones | Integrada | PR #6 fusionado en `main` (`74b0eb2`) |
 | 7. Comunidad y explorar | Integrada y desplegada | PR #7 fusionado en `main` (`24680e7`) |
 | 8. Tienda y pedidos | Integrada y desplegada | PR #8 fusionado en `main` (`9d5efa9`); pedidos `pending_payment` sin pagos simulados |
-| 9. Administración y reglas | Integrada y desplegada | PR #9 fusionado en `main` (`56b74ab`); auditoría y reglas inactivas |
+| 9. Administración y reglas | Parcialmente integrada | PR #9 fusionado; autorización, auditoría y operaciones base listas. Falta habilitar la cuenta administrativa real y completar su interfaz operativa avanzada. |
 | 10. Pruebas, seguridad y publicación | Integrada y desplegada | PR #10 fusionado en `main` (`0bdbc78`); Railway `848d3923` exitoso |
 
 ## Despliegue actual
@@ -34,6 +34,7 @@
 
 - Pago: no existe proveedor ni credencial configurada. Los pedidos permanecen pendientes de pago y no se simulan cobros aprobados.
 - Administración: se requiere una cuenta real de empresa identificada para asignar el rol administrativo inicial.
+- Administración avanzada: tras asignar esa cuenta, quedan por completar en interfaz las ediciones operativas de campañas, productos y turnos; la API base y controles de rol ya están presentes.
 - Reglas comerciales: faltan definiciones aprobadas de pujas, comisiones y ganancias. La configuración está intencionalmente inactiva.
 - Dominio propio: no se dispone de acceso DNS; la publicación usa el dominio de Railway.
 - Railway mantiene compatibilidad temporal con `railway.json` y avisa su futura deprecación. La aplicación sigue desplegando correctamente; migrar a su formato IaC cuando la CLI de Windows pueda evaluarlo de forma fiable.
