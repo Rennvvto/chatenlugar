@@ -13,6 +13,17 @@ export const requireAuth = (req, res, next) => {
   }
 }
 
+export const optionalAuth = (req, res, next) => {
+  const token = req.headers.authorization?.replace(/^Bearer\s+/i, '')
+  if (!token) return next()
+  try {
+    req.auth = jwt.verify(token, config.jwtSecret)
+  } catch {
+    // Las vistas públicas siguen disponibles; las acciones sensibles usan requireAuth.
+  }
+  return next()
+}
+
 export const issueAccessToken = (user) => jwt.sign(
   { sub: user.id, role: user.role, email: user.email },
   config.jwtSecret,

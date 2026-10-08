@@ -7,8 +7,9 @@
 | 1. Base fullstack y visual | Integrada | PR #1 fusionado en `main` (`b931b42`) |
 | 2. Railway y PostgreSQL | Integrada y desplegada | PR #2 fusionado en `main` (`c233a3e`); API pública activa |
 | 3. React con API real | Integrada | PR #3 fusionado en `main` (`f8bb70f`) |
-| 4. Navegación funcional | En curso | Rama `phase-4-navigation` |
-| 5 a 10 | Pendientes | Se ejecutarán como fases y PR independientes |
+| 4. Navegación funcional | Integrada | PR #4 fusionado en `main` (`6e6cdcb`) |
+| 5. Campañas y trabajo por turnos | En curso | Rama `phase-5-campaign-work` |
+| 6 a 10 | Pendientes | Se ejecutarán como fases y PR independientes |
 
 ## Despliegue actual
 
@@ -18,4 +19,4 @@
 
 ## Próxima acción
 
-Completar las rutas de navegación, búsqueda real y enlaces de interfaz; luego abrir el PR de la Fase 4.
+Desplegar y validar asignaciones, jornadas y actualizaciones de campaña; luego abrir el PR de la Fase 5.
