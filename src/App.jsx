@@ -6,6 +6,7 @@ import NotificationCenter from './NotificationCenter'
 import CommunityView from './CommunityView'
 import StoreView from './StoreView'
 import AdminView from './AdminView'
+import CollectionsView from './CollectionsView'
 import { clearSession, getCachedSession, login, register, restoreSession } from './platform-api'
 import logoMark from './assets/chatenlugar-logo.png'
 
@@ -180,6 +181,7 @@ export default function App() {
   if (window.location.pathname.startsWith('/comunidad')) return <CommunityView />
   if (window.location.pathname.startsWith('/tienda')) return <StoreView />
   if (window.location.pathname.startsWith('/administracion')) return <AdminView />
+  if (window.location.pathname.startsWith('/colecciones')) return <CollectionsView />
   if (/^\/(campanias|explorar|comunidad|tienda|colecciones)/.test(window.location.pathname)) return <PlatformHub />
 
   const [query, setQuery] = useState('')
