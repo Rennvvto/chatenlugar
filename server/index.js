@@ -1,5 +1,10 @@
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
+import { rateLimit } from 'express-rate-limit'
+import { existsSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { config } from './config.js'
 import { closeDatabase, isDatabaseReady, query } from './db.js'
 import { bootstrapDatabase } from './database/bootstrap.js'
@@ -14,8 +19,12 @@ import adminRoutes from './routes/admin.js'
 import { errorHandler, notFound } from './middleware/errors.js'
 
 const app = express()
+const serverDirectory = path.dirname(fileURLToPath(import.meta.url))
+const clientBuildDirectory = path.resolve(serverDirectory, '../dist')
 
 app.disable('x-powered-by')
+app.set('trust proxy', 1)
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }))
 app.use(cors({
   origin(origin, callback) {
     if (!origin || config.clientOrigins.includes(origin)) return callback(null, true)
@@ -25,6 +34,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 app.use(express.json({ limit: '1mb' }))
+app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 500, standardHeaders: 'draft-8', legacyHeaders: false }))
+app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, limit: 12, standardHeaders: 'draft-8', legacyHeaders: false, message: { error: 'TOO_MANY_REQUESTS', message: 'Demasiados intentos. Intenta nuevamente más tarde.' } }))
 
 app.get('/api/health', async (req, res) => {
   if (!isDatabaseReady()) return res.status(503).json({ status: 'degraded', database: 'not-configured' })
@@ -44,6 +55,14 @@ app.use('/api/community', communityRoutes)
 app.use('/api/explore', exploreRoutes)
 app.use('/api/store', storeRoutes)
 app.use('/api/admin', adminRoutes)
+
+if (existsSync(clientBuildDirectory)) {
+  app.use(express.static(clientBuildDirectory, { index: false, maxAge: '1h' }))
+  app.get('/{*clientPath}', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next()
+    return res.sendFile(path.join(clientBuildDirectory, 'index.html'))
+  })
+}
 app.use(notFound)
 app.use(errorHandler)
 
