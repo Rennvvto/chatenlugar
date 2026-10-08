@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { apiRequest } from './platform-api'
 import './platform-hub.css'
+import './explore.css'
 
 const sections = {
   campanias: { label: 'Campañas', eyebrow: 'ESPACIOS DE TRABAJO', title: 'Encuentra una campaña para trabajar.', copy: 'Revisa las campañas activas, su letra actual y el próximo turno disponible.', showCampaigns: true },
