@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import './campaign-workspace.css'
-import { getLocalSession } from './local-auth'
+import { getCachedSession } from './platform-api'
 import logoMark from './assets/chatenlugar-logo.png'
 
 const sequence = ['S', 'U', 'S', 'H', 'I']
@@ -61,7 +61,7 @@ export default function CampaignWorkspace() {
   const [working, setWorking] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [theme, setTheme] = useState(() => window.localStorage.getItem('chatenlugar-theme') || 'day')
-  const user = getLocalSession()?.user
+  const user = getCachedSession()?.user
   const userInitial = user?.name?.trim()?.[0]?.toUpperCase() || 'R'
 
   const product = products[productIndex]
