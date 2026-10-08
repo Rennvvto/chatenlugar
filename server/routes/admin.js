@@ -66,6 +66,18 @@ router.post('/campaigns', async (req, res, next) => {
     return res.status(201).json({ campaign: created.rows[0] })
   } catch (error) { await client.query('ROLLBACK'); return next(error) } finally { client.release() }
 })
+router.patch('/campaigns/:id', async (req, res, next) => {
+  try {
+    const data = campaignSchema.omit({ letters: true }).parse(req.body)
+    const result = await query(`UPDATE campaigns SET slug=$1,name=$2,short_description=$3,description=$4,status=$5,updated_at=NOW()
+      WHERE id=$6 RETURNING id,slug,name,status,current_letter,next_turn`, [data.slug, data.name, data.shortDescription, data.description, data.status, req.params.id])
+    if (!result.rowCount) return res.status(404).json({ error: 'CAMPAIGN_NOT_FOUND', message: 'No encontramos esa campaña.' })
+    await writeAudit({ query }, { actorId: req.auth.sub, action: 'campaign.updated', entityType: 'campaign', entityId: req.params.id, details: { status: data.status } })
+    return res.json({ campaign: result.rows[0] })
+  } catch (error) { return next(error) }
+})
+router.get('/assignments', async (req,res,next)=>{try{const r=await query(`SELECT a.id,a.target_turn,a.status,a.started_at,a.completed_at,c.name AS campaign_name,u.name AS worker_name,u.handle AS worker_handle FROM campaign_assignments a JOIN campaigns c ON c.id=a.campaign_id JOIN users u ON u.id=a.user_id ORDER BY a.created_at DESC LIMIT 200`);return res.json({assignments:r.rows})}catch(e){return next(e)}})
+router.patch('/assignments/:id/status', async (req,res,next)=>{try{const d=z.object({status:z.enum(['queued','active','completed','cancelled'])}).parse(req.body);const r=await query('UPDATE campaign_assignments SET status=$1, started_at=CASE WHEN $1=\'active\' THEN COALESCE(started_at,NOW()) ELSE started_at END, completed_at=CASE WHEN $1=\'completed\' THEN COALESCE(completed_at,NOW()) ELSE completed_at END WHERE id=$2 RETURNING id,status,user_id',[d.status,req.params.id]);if(!r.rowCount)return res.status(404).json({error:'ASSIGNMENT_NOT_FOUND',message:'No encontramos ese turno.'});await writeAudit({query},{actorId:req.auth.sub,action:'assignment.status_updated',entityType:'assignment',entityId:req.params.id,details:{status:d.status}});return res.json({assignment:r.rows[0]})}catch(e){return next(e)}})
 
 router.get('/products', async (req, res, next) => { try { const result = await query('SELECT id, slug, name, product_type, price_cents, stock, is_active, campaign_id, created_at FROM products ORDER BY created_at DESC'); return res.json({ products: result.rows }) } catch (error) { return next(error) } })
 router.post('/products', async (req, res, next) => {
@@ -77,6 +89,7 @@ router.post('/products', async (req, res, next) => {
     return res.status(201).json({ product: result.rows[0] })
   } catch (error) { return next(error) }
 })
+router.patch('/products/:id', async (req,res,next)=>{try{const d=productSchema.parse(req.body);const r=await query(`UPDATE products SET campaign_id=$1,slug=$2,name=$3,product_type=$4,description=$5,price_cents=$6,stock=$7,is_active=$8 WHERE id=$9 RETURNING id,slug,name,product_type,price_cents,stock,is_active,campaign_id`,[d.campaignId||null,d.slug,d.name,d.productType,d.description,d.priceCents,d.stock??null,d.isActive,req.params.id]);if(!r.rowCount)return res.status(404).json({error:'PRODUCT_NOT_FOUND',message:'No encontramos ese producto.'});await writeAudit({query},{actorId:req.auth.sub,action:'product.updated',entityType:'product',entityId:req.params.id,details:{price_cents:d.priceCents,is_active:d.isActive}});return res.json({product:r.rows[0]})}catch(e){return next(e)}})
 
 router.get('/orders', async (req, res, next) => { try { const result = await query(`SELECT o.id, o.status, o.total_cents, o.created_at, u.name AS customer_name, u.handle AS customer_handle FROM orders o JOIN users u ON u.id = o.user_id ORDER BY o.created_at DESC LIMIT 100`); return res.json({ orders: result.rows }) } catch (error) { return next(error) } })
 router.patch('/orders/:id/status', async (req, res, next) => {
