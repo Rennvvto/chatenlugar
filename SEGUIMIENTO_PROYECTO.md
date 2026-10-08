@@ -13,7 +13,7 @@
 | 7. Comunidad y explorar | Integrada y desplegada | PR #7 fusionado en `main` (`24680e7`) |
 | 8. Tienda y pedidos | Integrada y desplegada | PR #8 fusionado en `main` (`9d5efa9`); pedidos `pending_payment` sin pagos simulados |
 | 9. Administración y reglas | Integrada y desplegada | PR #9 fusionado en `main` (`56b74ab`); auditoría y reglas inactivas |
-| 10. Pruebas, seguridad y publicación | En revisión | Rama `phase-10-security-publication`, commit `1d3b633`; Railway `848d3923` exitoso |
+| 10. Pruebas, seguridad y publicación | Integrada y desplegada | PR #10 fusionado en `main` (`0bdbc78`); Railway `848d3923` exitoso |
 
 ## Despliegue actual
 
@@ -22,7 +22,7 @@
 - El frontend compilado se sirve desde el mismo servicio y origen que la API.
 - Credenciales y variables: administradas exclusivamente en Railway.
 
-## Validaciones de la Fase 10
+## Validaciones finales
 
 - Compilación React, sintaxis de API y de todos los módulos del servidor.
 - Auditoría de dependencias de producción: cero vulnerabilidades conocidas.
@@ -30,7 +30,7 @@
 - Pruebas en Railway: raíz pública, salud, campañas, exploración y aislamiento de pedidos/administración (`401` sin sesión).
 - Revisión de secretos rastreados y de espacios de Git. Detalle: `VALIDACION_FINAL.md`.
 
-## Bloqueos y pendientes externos
+## Dependencias externas pendientes
 
 - Pago: no existe proveedor ni credencial configurada. Los pedidos permanecen pendientes de pago y no se simulan cobros aprobados.
 - Administración: se requiere una cuenta real de empresa identificada para asignar el rol administrativo inicial.
@@ -40,4 +40,4 @@
 
 ## Próxima acción
 
-Revisar y fusionar el PR #10. Después, la siguiente intervención requiere las dependencias externas enumeradas arriba.
+Cuando estén disponibles las dependencias externas, configurar el pago real, promover la cuenta administrativa indicada, definir las reglas comerciales y conectar el dominio propio.
