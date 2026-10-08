@@ -3,6 +3,7 @@ import { changePassword, clearSession, getCachedSession, restoreSession, updateP
 import './campaign-workspace.css'
 import './profile-view.css'
 import logoMark from './assets/chatenlugar-logo.png'
+import NotificationCenter from './NotificationCenter'
 
 function Icon({ name, size = 20 }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }
@@ -101,7 +102,7 @@ export default function ProfileView() {
   return (
     <main className="workspace-shell profile-shell">
       <section className="profile-frame">
-        <header className="profile-topbar"><a href="/" className="workspace-brand"><img src={logoMark} alt="" /><span>chatenlugar</span></a><nav><a href="/campania/sushi">Campañas</a><a className="active" href="/perfil">Mi perfil</a></nav><div><button className="workspace-icon-button" type="button" aria-label={theme === 'day' ? 'Activar modo noche' : 'Activar modo día'} onClick={() => setTheme((current) => current === 'day' ? 'night' : 'day')}><Icon name={theme === 'day' ? 'moon' : 'sun'} size={19} /></button><button className="profile-logout" type="button" onClick={signOut}>Cerrar sesión <Icon name="exit" size={17} /></button></div></header>
+        <header className="profile-topbar"><a href="/" className="workspace-brand"><img src={logoMark} alt="" /><span>chatenlugar</span></a><nav><a href="/campanias">Campañas</a><a className="active" href="/perfil">Mi perfil</a></nav><div><NotificationCenter /><button className="workspace-icon-button" type="button" aria-label={theme === 'day' ? 'Activar modo noche' : 'Activar modo día'} onClick={() => setTheme((current) => current === 'day' ? 'night' : 'day')}><Icon name={theme === 'day' ? 'moon' : 'sun'} size={19} /></button><button className="profile-logout" type="button" onClick={signOut}>Cerrar sesión <Icon name="exit" size={17} /></button></div></header>
 
         <section className="profile-hero">
           <div className="profile-avatar">{initials(user.name)}</div>

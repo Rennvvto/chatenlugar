@@ -61,5 +61,8 @@ export const updateProfile = async (payload) => {
 }
 export const changePassword = (payload) => request('/users/me/password', { method: 'PATCH', body: JSON.stringify(payload) })
 export const listCampaigns = (search = '') => request(`/campaigns?q=${encodeURIComponent(search)}`)
+export const getNotifications = () => request('/notifications')
+export const markNotificationRead = (id) => request(`/notifications/${id}/read`, { method: 'PATCH' })
+export const markAllNotificationsRead = () => request('/notifications/read-all', { method: 'POST' })
 export const apiRequest = request
 export const apiBaseUrl = API_BASE_URL
