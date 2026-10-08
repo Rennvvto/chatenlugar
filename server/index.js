@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { config } from './config.js'
 import { closeDatabase, isDatabaseReady, query } from './db.js'
+import { bootstrapDatabase } from './database/bootstrap.js'
 import authRoutes from './routes/auth.js'
 import userRoutes from './routes/users.js'
 import campaignRoutes from './routes/campaigns.js'
@@ -38,12 +39,24 @@ app.use('/api/notifications', notificationRoutes)
 app.use(notFound)
 app.use(errorHandler)
 
-const server = app.listen(config.port, () => {
-  console.log(`API de chatenlugar activa en http://127.0.0.1:${config.port}`)
-  console.log(isDatabaseReady() ? 'PostgreSQL configurado.' : 'PostgreSQL pendiente: define DATABASE_URL en .env.')
-})
+let server
+
+const start = async () => {
+  if (isDatabaseReady()) {
+    await bootstrapDatabase()
+    console.log('Esquema de PostgreSQL comprobado y datos iniciales preparados.')
+  }
+  server = app.listen(config.port, () => {
+    console.log(`API de chatenlugar activa en http://127.0.0.1:${config.port}`)
+    console.log(isDatabaseReady() ? 'PostgreSQL configurado.' : 'PostgreSQL pendiente: define DATABASE_URL en .env.')
+  })
+}
 
 const shutdown = async () => {
+  if (!server) {
+    await closeDatabase()
+    process.exit(0)
+  }
   server.close(async () => {
     await closeDatabase()
     process.exit(0)
@@ -52,3 +65,9 @@ const shutdown = async () => {
 
 process.on('SIGINT', shutdown)
 process.on('SIGTERM', shutdown)
+
+start().catch(async (error) => {
+  console.error('La API no pudo iniciar.', error)
+  await closeDatabase()
+  process.exit(1)
+})
