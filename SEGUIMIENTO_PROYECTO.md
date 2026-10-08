@@ -12,23 +12,32 @@
 | 6. Notificaciones | Integrada | PR #6 fusionado en `main` (`74b0eb2`) |
 | 7. Comunidad y explorar | Integrada y desplegada | PR #7 fusionado en `main` (`24680e7`) |
 | 8. Tienda y pedidos | Integrada y desplegada | PR #8 fusionado en `main` (`9d5efa9`); pedidos `pending_payment` sin pagos simulados |
-| 9. Administración y reglas | En revisión | Rama `phase-9-administration-rules`, commit `5f89c7b`; Railway `8e9750f3` desplegando |
-| 10. Pruebas, seguridad y publicación | Pendiente | Se ejecutará en un PR independiente |
+| 9. Administración y reglas | Integrada y desplegada | PR #9 fusionado en `main` (`56b74ab`); auditoría y reglas inactivas |
+| 10. Pruebas, seguridad y publicación | En revisión | Rama `phase-10-security-publication`, commit `1d3b633`; Railway `848d3923` exitoso |
 
 ## Despliegue actual
 
-- API: `https://api-production-abc38.up.railway.app`
-- Salud: `/api/health` responde `ok` con PostgreSQL conectado.
+- Aplicación pública y API: `https://api-production-abc38.up.railway.app`
+- Salud: `GET /api/health` responde `ok` con PostgreSQL conectado.
+- El frontend compilado se sirve desde el mismo servicio y origen que la API.
 - Credenciales y variables: administradas exclusivamente en Railway.
-- La administración exige un rol actual en la base de datos y registra acciones sensibles. No se creó ni promovió ningún usuario administrativo sin una autorización identificada.
-- Las configuraciones comerciales se guardan inactivas; no se calculan ni aplican comisiones, pujas o ganancias hasta contar con reglas aprobadas.
 
-## Bloqueos conocidos
+## Validaciones de la Fase 10
 
-- Falta proveedor/credenciales de pago: los pedidos no pueden transitar a pago confirmado por una operación simulada.
-- Falta una cuenta de empresa concreta a la cual asignar el rol administrativo inicial.
-- No hay dominio propio ni acceso DNS disponible; se utilizará el dominio público de Railway en la publicación final.
+- Compilación React, sintaxis de API y de todos los módulos del servidor.
+- Auditoría de dependencias de producción: cero vulnerabilidades conocidas.
+- Prueba local del frontend servido por Express; pedido sin sesión devuelve `401`.
+- Pruebas en Railway: raíz pública, salud, campañas, exploración y aislamiento de pedidos/administración (`401` sin sesión).
+- Revisión de secretos rastreados y de espacios de Git. Detalle: `VALIDACION_FINAL.md`.
+
+## Bloqueos y pendientes externos
+
+- Pago: no existe proveedor ni credencial configurada. Los pedidos permanecen pendientes de pago y no se simulan cobros aprobados.
+- Administración: se requiere una cuenta real de empresa identificada para asignar el rol administrativo inicial.
+- Reglas comerciales: faltan definiciones aprobadas de pujas, comisiones y ganancias. La configuración está intencionalmente inactiva.
+- Dominio propio: no se dispone de acceso DNS; la publicación usa el dominio de Railway.
+- Railway mantiene compatibilidad temporal con `railway.json` y avisa su futura deprecación. La aplicación sigue desplegando correctamente; migrar a su formato IaC cuando la CLI de Windows pueda evaluarlo de forma fiable.
 
 ## Próxima acción
 
-Confirmar el despliegue y fusionar el PR de la Fase 9; después realizar pruebas, endurecimiento y publicación final en la Fase 10.
+Revisar y fusionar el PR #10. Después, la siguiente intervención requiere las dependencias externas enumeradas arriba.
