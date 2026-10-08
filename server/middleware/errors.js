@@ -1,6 +1,9 @@
 export const notFound = (req, res) => res.status(404).json({ error: 'NOT_FOUND', message: 'No encontramos ese recurso.' })
 
 export const errorHandler = (error, req, res, next) => {
+  if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
+    return res.status(400).json({ error: 'INVALID_JSON', message: 'El cuerpo de la solicitud no es válido.' })
+  }
   if (error?.code === 'DATABASE_NOT_CONFIGURED') {
     return res.status(503).json({ error: 'DATABASE_NOT_CONFIGURED', message: error.message })
   }
