@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { changeLocalPassword, clearLocalSession, getLocalSession, updateLocalProfile } from './local-auth'
 import './campaign-workspace.css'
 import './profile-view.css'
+import logoMark from './assets/chatenlugar-logo.png'
 
 function Icon({ name, size = 20 }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }
@@ -42,11 +43,11 @@ export default function ProfileView() {
   }, [user?.id])
 
   const stats = useMemo(() => [
-    ['01', 'Campaña activa'], ['00', 'Prendas en colección'], ['00', 'Aportes publicados'],
+    ['01', 'Campaña activa'], ['00', 'Prendas en colección'], ['00', 'Actualizaciones'],
   ], [])
 
   if (!user) {
-    return <main className="profile-access"><section><a href="/" className="workspace-brand">chatenlugar</a><h1>Inicia sesión para ver tu perfil.</h1><p>Tu perfil se crea al registrarte y queda disponible desde cualquier vista de la plataforma.</p><a className="profile-primary-link" href="/?acceso=login">Ingresar <Icon name="arrow" size={18} /></a></section></main>
+    return <main className="profile-access"><section><a href="/" className="workspace-brand"><img src={logoMark} alt="" /><span>chatenlugar</span></a><h1>Inicia sesión para ver tu perfil.</h1><p>Tu perfil se crea al registrarte y queda disponible desde cualquier vista de la plataforma.</p><a className="profile-primary-link" href="/?acceso=login">Ingresar <Icon name="arrow" size={18} /></a></section></main>
   }
 
   const saveProfile = (event) => {
@@ -83,7 +84,7 @@ export default function ProfileView() {
   return (
     <main className="workspace-shell profile-shell">
       <section className="profile-frame">
-        <header className="profile-topbar"><a href="/" className="workspace-brand">chatenlugar</a><nav><a href="/campania/sushi">Campañas</a><a className="active" href="/perfil">Mi perfil</a></nav><div><button className="workspace-icon-button" type="button" aria-label={theme === 'day' ? 'Activar modo noche' : 'Activar modo día'} onClick={() => setTheme((current) => current === 'day' ? 'night' : 'day')}><Icon name={theme === 'day' ? 'moon' : 'sun'} size={19} /></button><button className="profile-logout" type="button" onClick={signOut}>Cerrar sesión <Icon name="exit" size={17} /></button></div></header>
+        <header className="profile-topbar"><a href="/" className="workspace-brand"><img src={logoMark} alt="" /><span>chatenlugar</span></a><nav><a href="/campania/sushi">Campañas</a><a className="active" href="/perfil">Mi perfil</a></nav><div><button className="workspace-icon-button" type="button" aria-label={theme === 'day' ? 'Activar modo noche' : 'Activar modo día'} onClick={() => setTheme((current) => current === 'day' ? 'night' : 'day')}><Icon name={theme === 'day' ? 'moon' : 'sun'} size={19} /></button><button className="profile-logout" type="button" onClick={signOut}>Cerrar sesión <Icon name="exit" size={17} /></button></div></header>
 
         <section className="profile-hero">
           <div className="profile-avatar">{initials(user.name)}</div>
@@ -105,7 +106,7 @@ export default function ProfileView() {
           <article className="profile-campaign-card"><span className="profile-live"><i />EN VIVO</span><p>CAMPAÑA ACTIVA</p><h3>SUSHI</h3><span>Letra actual: <strong>S</strong></span><a href="/campania/sushi">Ir a la campaña <Icon name="arrow" size={18} /></a></article>
         </section>}
 
-        {tab === 'edit' && <section className="profile-content profile-form-view"><div><p className="profile-eyebrow">INFORMACIÓN PERSONAL</p><h2>Edita cómo te ven en la plataforma.</h2><p>Tu usuario se actualiza automáticamente a partir de tu nombre.</p></div><form onSubmit={saveProfile}><label>Nombre completo<input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} required /></label><label>Correo electrónico<input type="email" value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} required /></label><label>Ubicación<input value={profileForm.location} onChange={(event) => setProfileForm({ ...profileForm, location: event.target.value })} placeholder="Ej.: Santiago, Chile" /></label><label className="profile-textarea">Descripción<textarea maxLength={220} value={profileForm.bio} onChange={(event) => setProfileForm({ ...profileForm, bio: event.target.value })} placeholder="Cuéntale algo breve a la comunidad." /><small>{profileForm.bio.length}/220</small></label><button className="profile-save" type="submit">Guardar cambios <Icon name="arrow" size={18} /></button></form></section>}
+        {tab === 'edit' && <section className="profile-content profile-form-view"><div><p className="profile-eyebrow">INFORMACIÓN PERSONAL</p><h2>Edita cómo te ven en la plataforma.</h2><p>Tu usuario se actualiza automáticamente a partir de tu nombre.</p></div><form onSubmit={saveProfile}><label>Nombre completo<input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} required /></label><label>Correo electrónico<input type="email" value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} required /></label><label>Ubicación<input value={profileForm.location} onChange={(event) => setProfileForm({ ...profileForm, location: event.target.value })} placeholder="Ej.: Santiago, Chile" /></label><label className="profile-textarea">Descripción<textarea maxLength={220} value={profileForm.bio} onChange={(event) => setProfileForm({ ...profileForm, bio: event.target.value })} placeholder="Describe brevemente tu trabajo en la plataforma." /><small>{profileForm.bio.length}/220</small></label><button className="profile-save" type="submit">Guardar cambios <Icon name="arrow" size={18} /></button></form></section>}
 
         {tab === 'security' && <section className="profile-content profile-form-view security-view"><div><p className="profile-eyebrow">SEGURIDAD</p><h2>Protege tu cuenta.</h2><p>Usa una contraseña de al menos 8 caracteres.</p><div className="profile-local-note"><Icon name="shield" size={19} />Esta versión guarda la sesión en este navegador mientras desarrollamos el prototipo.</div></div><form onSubmit={savePassword}><label>Contraseña actual<input type="password" value={passwordForm.currentPassword} onChange={(event) => setPasswordForm({ ...passwordForm, currentPassword: event.target.value })} required /></label><label>Nueva contraseña<input type="password" value={passwordForm.newPassword} onChange={(event) => setPasswordForm({ ...passwordForm, newPassword: event.target.value })} minLength="8" required /></label><label>Confirma la nueva contraseña<input type="password" value={passwordForm.confirmPassword} onChange={(event) => setPasswordForm({ ...passwordForm, confirmPassword: event.target.value })} minLength="8" required /></label><button className="profile-save" type="submit">Actualizar contraseña <Icon name="shield" size={18} /></button></form></section>}
       </section>
