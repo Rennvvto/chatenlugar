@@ -9,6 +9,7 @@ import campaignRoutes from './routes/campaigns.js'
 import notificationRoutes from './routes/notifications.js'
 import communityRoutes from './routes/community.js'
 import exploreRoutes from './routes/explore.js'
+import storeRoutes from './routes/store.js'
 import { errorHandler, notFound } from './middleware/errors.js'
 
 const app = express()
@@ -40,6 +41,7 @@ app.use('/api/campaigns', campaignRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/community', communityRoutes)
 app.use('/api/explore', exploreRoutes)
+app.use('/api/store', storeRoutes)
 app.use(notFound)
 app.use(errorHandler)
 

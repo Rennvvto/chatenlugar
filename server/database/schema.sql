@@ -13,8 +13,10 @@ DO $$ BEGIN
   CREATE TYPE assignment_status AS ENUM ('queued', 'active', 'completed', 'cancelled');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
-  CREATE TYPE order_status AS ENUM ('paid', 'print_requested', 'in_production', 'shipped', 'delivered', 'cancelled');
+  CREATE TYPE order_status AS ENUM ('pending_payment', 'paid', 'print_requested', 'in_production', 'shipped', 'delivered', 'cancelled');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+ALTER TYPE order_status ADD VALUE IF NOT EXISTS 'pending_payment' BEFORE 'paid';
 
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
