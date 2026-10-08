@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import CampaignWorkspace from './CampaignWorkspace'
 import ProfileView from './ProfileView'
-import { clearLocalSession, getLocalSession, loginLocalUser, registerLocalUser } from './local-auth'
+import { clearSession, getCachedSession, login, register, restoreSession } from './platform-api'
 import logoMark from './assets/chatenlugar-logo.png'
 
 const campaigns = [
@@ -131,7 +131,7 @@ function Modal({ mode, campaign, onClose, onAuthenticated }) {
     setAuthError('')
     setIsSubmitting(true)
     try {
-      const session = isLogin ? await loginLocalUser(credentials) : await registerLocalUser(credentials)
+      const session = isLogin ? await login(credentials) : await register(credentials)
       onAuthenticated(session)
       window.location.assign('/perfil')
     } catch (error) {
@@ -176,7 +176,8 @@ export default function App() {
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState('hola')
   const [modal, setModal] = useState(null)
-  const [session, setSession] = useState(() => getLocalSession())
+  const [session, setSession] = useState(() => getCachedSession())
+  const [authLoading, setAuthLoading] = useState(() => Boolean(getCachedSession()?.token))
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
   const [theme, setTheme] = useState(() => window.localStorage.getItem('chatenlugar-theme') || 'day')
@@ -185,6 +186,23 @@ export default function App() {
     document.documentElement.dataset.theme = theme
     window.localStorage.setItem('chatenlugar-theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    let active = true
+    restoreSession().then((nextSession) => {
+      if (active) setSession(nextSession)
+    }).catch(() => {
+      if (active) setSession(null)
+    }).finally(() => {
+      if (active) setAuthLoading(false)
+    })
+    const handleExpiredSession = () => setSession(null)
+    window.addEventListener('chatenlugar:session-expired', handleExpiredSession)
+    return () => {
+      active = false
+      window.removeEventListener('chatenlugar:session-expired', handleExpiredSession)
+    }
+  }, [])
 
   useEffect(() => {
     const access = new URLSearchParams(window.location.search).get('acceso')
@@ -230,7 +248,7 @@ export default function App() {
             <Icon name={theme === 'day' ? 'moon' : 'sun'} size={19} />
             <span>{theme === 'day' ? 'Noche' : 'Día'}</span>
           </button>
-          {session ? <><a className="button button-quiet" href="/perfil">Mi perfil</a><button className="button button-coral" type="button" onClick={() => { clearLocalSession(); setSession(null) }}>Cerrar sesión</button></> : <><button className="button button-quiet" type="button" onClick={() => setModal('login')}>Ingresar</button><button className="button button-coral" type="button" onClick={() => setModal('signup')}>Crear cuenta</button></>}
+          {authLoading ? <span className="auth-loading">Cargando cuenta</span> : session ? <><a className="button button-quiet" href="/perfil">Mi perfil</a><button className="button button-coral" type="button" onClick={() => { clearSession(); setSession(null) }}>Cerrar sesión</button></> : <><button className="button button-quiet" type="button" onClick={() => setModal('login')}>Ingresar</button><button className="button button-coral" type="button" onClick={() => setModal('signup')}>Crear cuenta</button></>}
         </div>
       </header>
 

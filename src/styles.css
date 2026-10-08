@@ -64,6 +64,7 @@ a { color: inherit; text-decoration: none; }
 .primary-nav a { opacity: .88; transition: opacity .2s ease; }
 .primary-nav a:hover { opacity: 1; }
 .header-actions { display: flex; gap: 10px; }
+.auth-loading { display: inline-flex; align-items: center; min-height: 42px; padding: 0 12px; color: rgba(255,255,255,.82); font-size: .8rem; font-weight: 700; }
 .theme-toggle { min-height: 43px; display: inline-flex; align-items: center; gap: 7px; padding: 0 12px; color: white; border: 1px solid rgba(255,255,255,.46); border-radius: 10px; background: rgba(255,255,255,.09); font-size: .78rem; font-weight: 700; transition: background .2s ease, transform .2s ease; }
 .theme-toggle:hover { background: rgba(255,255,255,.18); transform: translateY(-2px); }
 .mobile-toggle { display: none; color: white; background: transparent; border: 0; margin-left: auto; padding: 8px; }

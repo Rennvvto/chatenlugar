@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { changeLocalPassword, clearLocalSession, getLocalSession, updateLocalProfile } from './local-auth'
+import { changePassword, clearSession, getCachedSession, restoreSession, updateProfile } from './platform-api'
 import './campaign-workspace.css'
 import './profile-view.css'
 import logoMark from './assets/chatenlugar-logo.png'
@@ -25,7 +25,8 @@ const initials = (name = '') => name.trim().split(/\s+/).slice(0, 2).map((part) 
 const formatDate = (date) => new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric' }).format(new Date(date))
 
 export default function ProfileView() {
-  const [session, setSession] = useState(() => getLocalSession())
+  const [session, setSession] = useState(() => getCachedSession())
+  const [loadingSession, setLoadingSession] = useState(() => Boolean(getCachedSession()?.token))
   const [tab, setTab] = useState('summary')
   const [notice, setNotice] = useState(null)
   const [theme, setTheme] = useState(() => window.localStorage.getItem('chatenlugar-theme') || 'day')
@@ -39,6 +40,18 @@ export default function ProfileView() {
   }, [theme])
 
   useEffect(() => {
+    let active = true
+    restoreSession().then((nextSession) => {
+      if (active) setSession(nextSession)
+    }).catch(() => {
+      if (active) setSession(null)
+    }).finally(() => {
+      if (active) setLoadingSession(false)
+    })
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
     if (user) setProfileForm({ name: user.name, email: user.email, bio: user.bio || '', location: user.location || '' })
   }, [user?.id])
 
@@ -46,15 +59,19 @@ export default function ProfileView() {
     ['01', 'Campaña activa'], ['00', 'Prendas en colección'], ['00', 'Actualizaciones'],
   ], [])
 
+  if (loadingSession) {
+    return <main className="profile-access"><section><a href="/" className="workspace-brand"><img src={logoMark} alt="" /><span>chatenlugar</span></a><h1>Cargando tu perfil.</h1><p>Estamos comprobando tu sesión de forma segura.</p></section></main>
+  }
+
   if (!user) {
     return <main className="profile-access"><section><a href="/" className="workspace-brand"><img src={logoMark} alt="" /><span>chatenlugar</span></a><h1>Inicia sesión para ver tu perfil.</h1><p>Tu perfil se crea al registrarte y queda disponible desde cualquier vista de la plataforma.</p><a className="profile-primary-link" href="/?acceso=login">Ingresar <Icon name="arrow" size={18} /></a></section></main>
   }
 
-  const saveProfile = (event) => {
+  const saveProfile = async (event) => {
     event.preventDefault()
     try {
-      const nextSession = updateLocalProfile({ id: user.id, ...profileForm })
-      setSession(nextSession)
+      const nextUser = await updateProfile(profileForm)
+      setSession((current) => ({ ...current, user: nextUser }))
       setNotice({ type: 'success', text: 'Tu perfil se actualizó correctamente.' })
     } catch (error) {
       setNotice({ type: 'error', text: error.message })
@@ -68,7 +85,7 @@ export default function ProfileView() {
       return
     }
     try {
-      await changeLocalPassword({ id: user.id, currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword })
+      await changePassword({ currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword })
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
       setNotice({ type: 'success', text: 'Tu contraseña se actualizó correctamente.' })
     } catch (error) {
@@ -77,7 +94,7 @@ export default function ProfileView() {
   }
 
   const signOut = () => {
-    clearLocalSession()
+    clearSession()
     window.location.assign('/')
   }
 
@@ -108,7 +125,7 @@ export default function ProfileView() {
 
         {tab === 'edit' && <section className="profile-content profile-form-view"><div><p className="profile-eyebrow">INFORMACIÓN PERSONAL</p><h2>Edita cómo te ven en la plataforma.</h2><p>Tu usuario se actualiza automáticamente a partir de tu nombre.</p></div><form onSubmit={saveProfile}><label>Nombre completo<input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} required /></label><label>Correo electrónico<input type="email" value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} required /></label><label>Ubicación<input value={profileForm.location} onChange={(event) => setProfileForm({ ...profileForm, location: event.target.value })} placeholder="Ej.: Santiago, Chile" /></label><label className="profile-textarea">Descripción<textarea maxLength={220} value={profileForm.bio} onChange={(event) => setProfileForm({ ...profileForm, bio: event.target.value })} placeholder="Describe brevemente tu trabajo en la plataforma." /><small>{profileForm.bio.length}/220</small></label><button className="profile-save" type="submit">Guardar cambios <Icon name="arrow" size={18} /></button></form></section>}
 
-        {tab === 'security' && <section className="profile-content profile-form-view security-view"><div><p className="profile-eyebrow">SEGURIDAD</p><h2>Protege tu cuenta.</h2><p>Usa una contraseña de al menos 8 caracteres.</p><div className="profile-local-note"><Icon name="shield" size={19} />Esta versión guarda la sesión en este navegador mientras desarrollamos el prototipo.</div></div><form onSubmit={savePassword}><label>Contraseña actual<input type="password" value={passwordForm.currentPassword} onChange={(event) => setPasswordForm({ ...passwordForm, currentPassword: event.target.value })} required /></label><label>Nueva contraseña<input type="password" value={passwordForm.newPassword} onChange={(event) => setPasswordForm({ ...passwordForm, newPassword: event.target.value })} minLength="8" required /></label><label>Confirma la nueva contraseña<input type="password" value={passwordForm.confirmPassword} onChange={(event) => setPasswordForm({ ...passwordForm, confirmPassword: event.target.value })} minLength="8" required /></label><button className="profile-save" type="submit">Actualizar contraseña <Icon name="shield" size={18} /></button></form></section>}
+        {tab === 'security' && <section className="profile-content profile-form-view security-view"><div><p className="profile-eyebrow">SEGURIDAD</p><h2>Protege tu cuenta.</h2><p>Usa una contraseña de al menos 8 caracteres.</p><div className="profile-local-note"><Icon name="shield" size={19} />Tu sesión y contraseña se validan mediante la API protegida de chatenlugar.</div></div><form onSubmit={savePassword}><label>Contraseña actual<input type="password" value={passwordForm.currentPassword} onChange={(event) => setPasswordForm({ ...passwordForm, currentPassword: event.target.value })} required /></label><label>Nueva contraseña<input type="password" value={passwordForm.newPassword} onChange={(event) => setPasswordForm({ ...passwordForm, newPassword: event.target.value })} minLength="8" required /></label><label>Confirma la nueva contraseña<input type="password" value={passwordForm.confirmPassword} onChange={(event) => setPasswordForm({ ...passwordForm, confirmPassword: event.target.value })} minLength="8" required /></label><button className="profile-save" type="submit">Actualizar contraseña <Icon name="shield" size={18} /></button></form></section>}
       </section>
     </main>
   )
