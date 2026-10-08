@@ -16,6 +16,7 @@ import communityRoutes from './routes/community.js'
 import exploreRoutes from './routes/explore.js'
 import storeRoutes from './routes/store.js'
 import adminRoutes from './routes/admin.js'
+import collectionRoutes from './routes/collections.js'
 import { errorHandler, notFound } from './middleware/errors.js'
 
 const app = express()
@@ -55,6 +56,7 @@ app.use('/api/community', communityRoutes)
 app.use('/api/explore', exploreRoutes)
 app.use('/api/store', storeRoutes)
 app.use('/api/admin', adminRoutes)
+app.use('/api/collections', collectionRoutes)
 
 if (existsSync(clientBuildDirectory)) {
   app.use(express.static(clientBuildDirectory, { index: false, maxAge: '1h' }))
