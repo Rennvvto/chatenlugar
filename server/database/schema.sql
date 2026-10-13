@@ -133,9 +133,16 @@ CREATE TABLE IF NOT EXISTS orders (
   total_cents INTEGER NOT NULL CHECK (total_cents >= 0),
   print_requested_at TIMESTAMPTZ,
   shipped_at TIMESTAMPTZ,
+  paid_at TIMESTAMPTZ,
+  flow_token TEXT UNIQUE,
+  flow_order BIGINT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS flow_token TEXT UNIQUE;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS flow_order BIGINT;
 
 CREATE TABLE IF NOT EXISTS order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

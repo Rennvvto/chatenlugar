@@ -39,7 +39,8 @@ export default function StoreView() {
       const { order } = await apiRequest('/store/orders', { method: 'POST', body: JSON.stringify({ items: cart.map((item) => ({ productId: item.id, quantity: item.quantity })) }) })
       setOrders((current) => [order, ...current])
       setCart([])
-      setMessage('Pedido registrado como pendiente de pago. La confirmación real de pago todavía no está configurada.')
+      const payment = await apiRequest(`/payments/orders/${order.id}/flow`, { method: 'POST' })
+      window.location.assign(payment.paymentUrl)
     } catch (requestError) { setError(requestError.message) }
   }
   const requestPrint = async (id) => {
@@ -47,6 +48,12 @@ export default function StoreView() {
       const { order } = await apiRequest(`/store/orders/${id}/print-request`, { method: 'POST' })
       setOrders((current) => current.map((item) => item.id === id ? { ...item, ...order } : item))
       setMessage('Solicitud de impresión registrada. El plazo de despacho es de hasta 15 días desde hoy.')
+    } catch (requestError) { setError(requestError.message) }
+  }
+  const payWithFlow = async (id) => {
+    try {
+      const payment = await apiRequest(`/payments/orders/${id}/flow`, { method: 'POST' })
+      window.location.assign(payment.paymentUrl)
     } catch (requestError) { setError(requestError.message) }
   }
 

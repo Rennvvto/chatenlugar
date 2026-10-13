@@ -16,6 +16,7 @@ import communityRoutes from './routes/community.js'
 import exploreRoutes from './routes/explore.js'
 import storeRoutes from './routes/store.js'
 import adminRoutes from './routes/admin.js'
+import paymentRoutes from './routes/payments.js'
 import collectionRoutes from './routes/collections.js'
 import { errorHandler, notFound } from './middleware/errors.js'
 
@@ -35,6 +36,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 app.use(express.json({ limit: '1mb' }))
+app.use(express.urlencoded({ extended: false, limit: '1mb' }))
 app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 500, standardHeaders: 'draft-8', legacyHeaders: false }))
 app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, limit: 12, standardHeaders: 'draft-8', legacyHeaders: false, message: { error: 'TOO_MANY_REQUESTS', message: 'Demasiados intentos. Intenta nuevamente más tarde.' } }))
 
@@ -56,6 +58,7 @@ app.use('/api/community', communityRoutes)
 app.use('/api/explore', exploreRoutes)
 app.use('/api/store', storeRoutes)
 app.use('/api/admin', adminRoutes)
+app.use('/api/payments', paymentRoutes)
 app.use('/api/collections', collectionRoutes)
 
 if (existsSync(clientBuildDirectory)) {
