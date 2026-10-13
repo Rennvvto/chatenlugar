@@ -48,3 +48,10 @@
 ## Siguiente acción
 
 Habilitar un producto real y ejecutar una compra controlada de bajo monto para validar el ciclo completo de Flow, retorno y confirmación servidor-a-servidor.
+
+## Actualización visual del espacio de trabajo
+
+- Estado: rediseño en curso en la rama `redesign-unified-workspace`.
+- Alcance: Campañas, Equipo, Explorar, Tienda y Mi perfil comparten ahora la misma estructura aprobada: lienzo blanco, fondo azul, barra superior, navegación lateral y acciones coral.
+- Funciones preservadas: búsqueda contra API, publicaciones y comentarios, pedidos y pago Flow, solicitud de impresión, edición de perfil y cambio de contraseña.
+- Validaciones locales: compilación React, sintaxis de API y revisión de diff correctas. Pendiente: PR, despliegue Railway y revisión final desde la URL pública.
