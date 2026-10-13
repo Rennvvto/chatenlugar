@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { apiRequest, getCachedSession } from './platform-api'
-import './community.css'
+import WorkspaceChrome, { WorkspaceIcon } from './WorkspaceChrome'
 
 const formatDate = (value) => new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
 
@@ -90,28 +90,20 @@ export default function CommunityView() {
     } catch (requestError) { setError(requestError.message) }
   }
 
-  return <main className="community-shell">
-    <header className="community-header"><a href="/">chatenlugar</a><nav><a href="/campanias">Campañas</a><a className="active" href="/comunidad">Equipo</a><a href="/explorar">Explorar</a><a href="/perfil">Mi perfil</a></nav></header>
-    <section className="community-hero"><p>COMUNIDAD DE TRABAJO</p><h1>Actualizaciones del equipo.</h1><span>Revisa avances publicados por trabajadores activos en las campañas.</span></section>
-    <section className="community-feed">
-      {error && <p className="community-state error">{error}</p>}
-      {loading && !updates.length && <p className="community-state">Cargando actualizaciones.</p>}
-      {!loading && !updates.length && <p className="community-state">Aún no hay actualizaciones de trabajo publicadas.</p>}
-      {updates.map((update) => <article className="community-post" key={update.id}>
-        <header><div><strong>{update.author_name}</strong><span>@{update.author_handle} · {update.campaign_name}</span></div><time>{formatDate(update.created_at)}</time></header>
+  return <WorkspaceChrome active="team">
+    <header className="route-heading"><div><p>EQUIPO</p><h1>Actualizaciones de trabajo.</h1><span>Revisa los avances publicados desde las campañas activas.</span></div><div className="route-heading-aside">ESPACIO DE TRABAJO<strong>{loading ? 'Actualizando' : `${updates.length} publicaciones`}</strong></div></header>
+    <div className="route-layout"><section className="route-content">
+      <div className="route-section-title"><h2>Actividad reciente</h2><span>Publicaciones verificadas por campaña</span></div>
+      {error && <p className="route-state error">{error}</p>}
+      {loading && !updates.length && <p className="route-state">Cargando actualizaciones.</p>}
+      {!loading && !updates.length && <p className="route-state">Aún no hay actualizaciones de trabajo publicadas.</p>}
+      <div className="team-feed">{updates.map((update) => <article className="team-post" key={update.id}>
+        <header><div className="team-author"><strong>{update.author_name}</strong><span>@{update.author_handle} · {update.campaign_name}</span></div><time>{formatDate(update.created_at)}</time></header>
         <p>{update.body}</p>
-        <footer>
-          <button className={update.liked_by_me ? 'active' : ''} type="button" onClick={() => react(update.id)}>Me interesa {update.likes}</button>
-          <button type="button" onClick={() => showComments(update.id)}>Comentarios {update.comments}</button>
-          <a href={`/campania/${update.campaign_slug}`}>Ver campaña</a>
-          {user?.id === update.author_id && <><button type="button" onClick={() => editUpdate(update)}>Editar</button><button type="button" onClick={() => deleteUpdate(update.id)}>Eliminar</button></>}
-        </footer>
-        {comments[update.id] && <section className="community-comments">
-          {comments[update.id].map((comment) => <div key={comment.id}><strong>{comment.author_name}</strong><span>{comment.body}</span>{user?.id === comment.author_id && <aside><button type="button" onClick={() => editComment(update.id, comment)}>Editar</button><button type="button" onClick={() => deleteComment(update.id, comment.id)}>Eliminar</button></aside>}</div>)}
-          <form onSubmit={(event) => publishComment(event, update.id)}><input value={commentText[update.id] || ''} onChange={(event) => setCommentText((current) => ({ ...current, [update.id]: event.target.value }))} placeholder="Escribe un comentario" aria-label="Escribe un comentario" /><button type="submit">Publicar</button></form>
-        </section>}
-      </article>)}
-      {nextCursor && <button className="community-more" disabled={loading} type="button" onClick={() => load(nextCursor)}>{loading ? 'Cargando' : 'Cargar más'}</button>}
-    </section>
-  </main>
+        <footer><button className={update.liked_by_me ? 'active' : ''} type="button" onClick={() => react(update.id)}>Me interesa <strong>{update.likes}</strong></button><button type="button" onClick={() => showComments(update.id)}>Comentarios <strong>{update.comments}</strong></button><a href={`/campania/${update.campaign_slug}`}>Ver campaña <WorkspaceIcon name="arrow" size={16} /></a>{user?.id === update.author_id && <span className="team-owner-actions"><button type="button" onClick={() => editUpdate(update)}>Editar</button><button type="button" onClick={() => deleteUpdate(update.id)}>Eliminar</button></span>}</footer>
+        {comments[update.id] && <section className="team-comments">{comments[update.id].map((comment) => <div className="team-comment" key={comment.id}><div><strong>{comment.author_name}</strong><span>{comment.body}</span></div>{user?.id === comment.author_id && <aside><button type="button" onClick={() => editComment(update.id, comment)}>Editar</button><button type="button" onClick={() => deleteComment(update.id, comment.id)}>Eliminar</button></aside>}</div>)}<form onSubmit={(event) => publishComment(event, update.id)}><input value={commentText[update.id] || ''} onChange={(event) => setCommentText((current) => ({ ...current, [update.id]: event.target.value }))} placeholder="Escribe un comentario" aria-label="Escribe un comentario" /><button type="submit">Publicar</button></form></section>}
+      </article>)}</div>
+      {nextCursor && <button className="route-outline-action" disabled={loading} type="button" onClick={() => load(nextCursor)}>{loading ? 'Cargando' : 'Cargar más'} <WorkspaceIcon name="arrow" size={17} /></button>}
+    </section><aside className="route-aside"><h2>Trabaja con tu equipo</h2><div className="route-info"><h3>Actualizaciones por campaña</h3><p>Las publicaciones reúnen el trabajo compartido por personas inscritas en cada campaña.</p></div><div className="route-info"><h3>Tu actividad</h3><p>Inicia una jornada para publicar una actualización desde la campaña que tienes asignada.</p></div><a className="route-action" href="/campanias">Ver campañas <WorkspaceIcon name="arrow" /></a></aside></div>
+  </WorkspaceChrome>
 }
