@@ -176,7 +176,7 @@ function Modal({ mode, campaign, onClose, onAuthenticated }) {
 }
 
 export default function App() {
-  if (window.location.pathname.startsWith('/campania')) return <CampaignWorkspace />
+  if (window.location.pathname.startsWith('/campania/')) return <CampaignWorkspace />
   if (window.location.pathname.startsWith('/perfil')) return <ProfileView />
   if (window.location.pathname.startsWith('/comunidad')) return <CommunityView />
   if (window.location.pathname.startsWith('/tienda')) return <StoreView />
