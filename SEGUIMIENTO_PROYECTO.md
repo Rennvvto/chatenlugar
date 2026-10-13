@@ -51,7 +51,7 @@ Habilitar un producto real y ejecutar una compra controlada de bajo monto para v
 
 ## Actualización visual del espacio de trabajo
 
-- Estado: rediseño en curso en la rama `redesign-unified-workspace`.
+- Estado: integrado y desplegado mediante PR #19 (`ee0e03b`).
 - Alcance: Campañas, Equipo, Explorar, Tienda y Mi perfil comparten ahora la misma estructura aprobada: lienzo blanco, fondo azul, barra superior, navegación lateral y acciones coral.
 - Funciones preservadas: búsqueda contra API, publicaciones y comentarios, pedidos y pago Flow, solicitud de impresión, edición de perfil y cambio de contraseña.
-- Validaciones locales: compilación React, sintaxis de API y revisión de diff correctas. Pendiente: PR, despliegue Railway y revisión final desde la URL pública.
+- Validaciones: compilación React, sintaxis de API, revisión de diff y cinco rutas locales correctas. Railway `d67efcf1-f2fa-486e-a920-17c33df6f418` quedó en línea; la URL pública, `/api/health` y los recursos JavaScript/CSS responden `200` con los tipos de contenido correctos.
