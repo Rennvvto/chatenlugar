@@ -1,6 +1,6 @@
 # Seguimiento de chatenlugar
 
-## Estado real al 8 de octubre de 2026
+## Estado real al 13 de octubre de 2026
 
 | Fase | Estado | Evidencia |
 | --- | --- | --- |
@@ -11,7 +11,7 @@
 | 5. Campañas y trabajo por turnos | Integrada | PR #5 fusionado en `main` (`2d9fce8`) |
 | 6. Notificaciones | Integrada | PR #6 fusionado en `main` (`74b0eb2`) |
 | 7. Comunidad y explorar | Integrada y desplegada | PR #7 fusionado en `main` (`24680e7`) |
-| 8. Tienda y pedidos | Integrada y desplegada | PR #8 fusionado en `main` (`9d5efa9`); pedidos `pending_payment` sin pagos simulados |
+| 8. Tienda y pedidos | Integrada; activación de Flow en curso | PR #8 fusionado en `main` (`9d5efa9`). PR #16 agrega Flow con confirmación servidor-a-servidor y pagos reales pendientes de desplegar y configurar. |
 | 9. Administración y reglas | Integrada y desplegada | PR #9 y ampliación administrativa PR #14 fusionados; autorización, auditoría y operaciones de campañas, productos y turnos disponibles. |
 | 10. Pruebas, seguridad y publicación | Integrada y desplegada | PR #10 fusionado en `main` (`0bdbc78`); Railway `848d3923` exitoso |
 
@@ -22,22 +22,27 @@
 - El frontend compilado se sirve desde el mismo servicio y origen que la API.
 - Credenciales y variables: administradas exclusivamente en Railway.
 
-## Validaciones finales
+## Activación de Flow
 
-- Compilación React, sintaxis de API y de todos los módulos del servidor.
-- Auditoría de dependencias de producción: cero vulnerabilidades conocidas.
-- Prueba local del frontend servido por Express; pedido sin sesión devuelve `401`.
-- Pruebas en Railway: raíz pública, salud, campañas, exploración y aislamiento de pedidos/administración (`401` sin sesión).
-- Revisión de secretos rastreados y de espacios de Git. Detalle: `VALIDACION_FINAL.md`.
+- PR #16: `https://github.com/Rennvvto/chatenlugar/pull/16`.
+- Crea pagos en pesos chilenos, valida el monto y el pedido, y marca un pedido como pagado únicamente después de consultar la confirmación de Flow desde el servidor.
+- Los callbacks duplicados no duplican pagos ni notificaciones; la creación de una sesión se bloquea por pedido para impedir cobros concurrentes.
+- Variables requeridas en Railway: `FLOW_API_KEY`, `FLOW_SECRET_KEY`, `FLOW_ENV=production` y `PUBLIC_APP_URL=https://api-production-abc38.up.railway.app`.
+- Ninguna credencial se incluye en este repositorio, commits ni archivos de configuración.
+
+## Validaciones pendientes de esta activación
+
+- Compilación React y validación sintáctica de la API antes de fusionar PR #16.
+- Revisión automática de GitHub cuando esté disponible.
+- Confirmación de salud después del despliegue y una compra controlada con un producto real habilitado. No se simulan pagos aprobados.
 
 ## Dependencias externas pendientes
 
-- Pago: no existe proveedor ni credencial configurada. Los pedidos permanecen pendientes de pago y no se simulan cobros aprobados.
 - Administración: se requiere una cuenta real de empresa identificada para asignar el rol administrativo inicial.
 - Reglas comerciales: faltan definiciones aprobadas de pujas, comisiones y ganancias. La configuración está intencionalmente inactiva.
-- Dominio propio: no se dispone de acceso DNS; la publicación usa el dominio de Railway.
+- Dominio propio: se requiere acceso al proveedor DNS para conectar `chatenlugar.cl`; mientras tanto la publicación usa el dominio de Railway.
 - Railway mantiene compatibilidad temporal con `railway.json` y avisa su futura deprecación. La aplicación sigue desplegando correctamente; migrar a su formato IaC cuando la CLI de Windows pueda evaluarlo de forma fiable.
 
-## Próxima acción
+## Siguiente acción
 
-Cuando estén disponibles las dependencias externas, configurar el pago real, promover la cuenta administrativa indicada, definir las reglas comerciales y conectar el dominio propio.
+Completar la revisión de PR #16, fusionarlo, configurar las variables protegidas de Flow en Railway, desplegar y comprobar el flujo de pago con una compra controlada.

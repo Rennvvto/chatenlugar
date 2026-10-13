@@ -12,4 +12,10 @@ export const config = {
   databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret: required('JWT_SECRET', process.env.NODE_ENV === 'production' ? '' : 'chatenlugar-local-development-secret-change-me'),
   clientOrigins: (process.env.CLIENT_ORIGIN || 'http://127.0.0.1:5173,http://localhost:5173').split(',').map((origin) => origin.trim()).filter(Boolean),
+  appUrl: (process.env.PUBLIC_APP_URL || 'http://127.0.0.1:5173').replace(/\/$/, ''),
+  flow: {
+    apiKey: process.env.FLOW_API_KEY || '',
+    secretKey: process.env.FLOW_SECRET_KEY || '',
+    environment: process.env.FLOW_ENV || '',
+  },
 }
