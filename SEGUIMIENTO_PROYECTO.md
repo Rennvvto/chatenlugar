@@ -55,3 +55,12 @@ Habilitar un producto real y ejecutar una compra controlada de bajo monto para v
 - Alcance: Campañas, Equipo, Explorar, Tienda y Mi perfil comparten ahora la misma estructura aprobada: lienzo blanco, fondo azul, barra superior, navegación lateral y acciones coral.
 - Funciones preservadas: búsqueda contra API, publicaciones y comentarios, pedidos y pago Flow, solicitud de impresión, edición de perfil y cambio de contraseña.
 - Validaciones: compilación React, sintaxis de API, revisión de diff y cinco rutas locales correctas. Railway `d67efcf1-f2fa-486e-a920-17c33df6f418` quedó en línea; la URL pública, `/api/health` y los recursos JavaScript/CSS responden `200` con los tipos de contenido correctos.
+
+## Campañas: letras, textos y pujas
+
+- Estado: implementación en curso en la rama `feat-letter-text-auctions`.
+- Alcance: textos configurables por letra, una puja por persona y letra, límite predeterminado de cinco pujas, revelación del texto ganador y avance seguro a la siguiente letra.
+- Chat: cada texto seleccionado desbloquea un chat personalizado; las pujas y mensajes quedan registrados como interacciones de esquirlas, sin asignar valores monetarios.
+- Empates: quedan bloqueados para una resolución administrativa auditada; no se aplica un desempate inventado.
+- Reglas: las referencias de 1.000 esquirlas, comisiones de poleras y fardos se guardan como configuración inactiva hasta recibir una fórmula comercial aprobada.
+- Cuenta administrativa: `Joseamaro22@gmail.com` aún no existe en PostgreSQL. Debe registrarse antes de asignarle el rol de administración.

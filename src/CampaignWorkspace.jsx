@@ -31,11 +31,16 @@ export default function CampaignWorkspace() {
   const slug = campaignSlug()
   const [campaign, setCampaign] = useState(null)
   const [updates, setUpdates] = useState([])
+  const [letterChat, setLetterChat] = useState(null)
+  const [selectedThread, setSelectedThread] = useState(null)
+  const [textMessages, setTextMessages] = useState([])
+  const [textMessage, setTextMessage] = useState('')
   const [message, setMessage] = useState('')
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [working, setWorking] = useState(false)
+  const [bidding, setBidding] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [theme, setTheme] = useState(() => window.localStorage.getItem('chatenlugar-theme') || 'day')
   const [user, setUser] = useState(() => getCachedSession()?.user || null)
@@ -44,9 +49,10 @@ export default function CampaignWorkspace() {
     setLoading(true)
     setError('')
     try {
-      const [campaignResponse, updatesResponse, session] = await Promise.all([apiRequest(`/campaigns/${slug}`), apiRequest(`/campaigns/${slug}/updates`), restoreSession().catch(() => null)])
+      const [campaignResponse, updatesResponse, letterChatResponse, session] = await Promise.all([apiRequest(`/campaigns/${slug}`), apiRequest(`/campaigns/${slug}/updates`), apiRequest(`/campaigns/${slug}/letter-chat`), restoreSession().catch(() => null)])
       setCampaign(campaignResponse.campaign)
       setUpdates(updatesResponse.updates)
+      setLetterChat(letterChatResponse.letterChat)
       setUser(session?.user || null)
     } catch (requestError) {
       setError(requestError.message)
@@ -101,6 +107,40 @@ export default function CampaignWorkspace() {
     } finally { setWorking(false) }
   }
 
+  const loadTextMessages = async (textId) => {
+    if (!user) return
+    try {
+      const result = await apiRequest(`/campaigns/${slug}/letter-chat/messages?textId=${encodeURIComponent(textId)}`)
+      setSelectedThread(result.thread)
+      setTextMessages(result.messages)
+    } catch (requestError) { setError(requestError.message) }
+  }
+
+  const placeTextBid = async (textId) => {
+    if (!user) return window.location.assign('/?acceso=login')
+    setBidding(true)
+    setError('')
+    try {
+      const result = await apiRequest(`/campaigns/${slug}/letter-chat/bids`, { method: 'POST', body: JSON.stringify({ textId }) })
+      setLetterChat(result.letterChat)
+      await loadTextMessages(textId)
+      setNotice(result.result.resolution === 'resolved' ? 'La letra se resolvió y la campaña avanzó.' : result.result.resolution === 'tie_pending' ? 'Se completaron las pujas. Esta letra requiere resolución administrativa por empate.' : 'Tu puja quedó registrada y tu chat personalizado está disponible.')
+      if (result.result.resolution === 'resolved') await loadCampaign()
+    } catch (requestError) { setError(requestError.message) } finally { setBidding(false) }
+  }
+
+  const publishTextMessage = async (event) => {
+    event.preventDefault()
+    const body = textMessage.trim()
+    if (!body || !selectedThread) return
+    setBidding(true)
+    try {
+      const result = await apiRequest(`/campaigns/${slug}/letter-chat/messages`, { method: 'POST', body: JSON.stringify({ textId: selectedThread.id, body }) })
+      setTextMessages((current) => [...current, { ...result.message, author_name: user.name, author_handle: user.handle }])
+      setTextMessage('')
+    } catch (requestError) { setError(requestError.message) } finally { setBidding(false) }
+  }
+
   if (loading) return <main className="workspace-shell"><section className="workspace-frame workspace-loading">Cargando campaña.</section></main>
   if (error && !campaign) return <main className="workspace-shell"><section className="workspace-frame workspace-loading">{error}<a href="/campanias">Volver a campañas</a></section></main>
 
@@ -111,7 +151,7 @@ export default function CampaignWorkspace() {
       <section className="workspace-main">
         <header className="campaign-summary"><div className="campaign-title"><span>CAMPAÑA</span><h1>{campaign.name}</h1><p>Letra actual: <strong>{campaign.current_letter || 'Pendiente'}</strong></p></div><div className="campaign-progress"><div className="progress-status"><span><i /> EN VIVO</span><strong>{progress}</strong></div><ol aria-label={`Secuencia de letras de ${campaign.name}`}>{campaign.letters.map((item) => <li className={item.status === 'active' ? 'active' : item.status === 'completed' ? 'completed' : ''} key={item.position}>{item.letter}</li>)}</ol></div><div className="campaign-next"><span>Turno asignado</span><strong>{assignment?.targetTurn?.toLocaleString('es-CL') || campaign.next_turn?.toLocaleString('es-CL')} <Icon name="chevron" size={18} /></strong></div><button className={assignment?.status === 'active' ? 'participate-button is-participating' : 'participate-button'} type="button" disabled={working || assignment?.status === 'completed'} onClick={handleWorkAction}>{working ? 'Actualizando' : actionLabel} <Icon name="chevron" size={20} /></button></header>
         {notice && <p className="workspace-notice">{notice}</p>}{error && <p className="workspace-error">{error}</p>}
-        <section className="conversation-panel" aria-labelledby="conversation-title"><div className="conversation-heading"><h2 id="conversation-title">Actualizaciones de trabajo</h2><span>{updates.length} publicadas</span></div><div className="post-list" aria-live="polite">{updates.length ? updates.map((update) => <article className="conversation-post" key={update.id}><div className="post-avatar own">{initials(update.author_name)}</div><div className="post-content"><div><strong>{update.author_name}</strong><time>{formatTime(update.created_at)}</time></div><p>{update.body}</p></div></article>) : <p className="workspace-empty">Aún no hay actualizaciones publicadas para esta campaña.</p>}</div>{canPublish ? <form className="message-composer" onSubmit={publishUpdate}><div className="post-avatar own">{initials(user?.name)}</div><div className="composer-box"><textarea value={message} maxLength={500} onChange={(event) => setMessage(event.target.value)} placeholder="Registra tu actualización de trabajo" aria-label="Registra tu actualización de trabajo" /><div><small>{message.length}/500</small><button className="publish-button" disabled={working} type="submit">Enviar actualización <Icon name="send" size={16} /></button></div></div></form> : <p className="workspace-empty">{user ? 'Inicia tu jornada para poder publicar actualizaciones.' : 'Inicia sesión y solicita un turno para registrar actualizaciones.'}</p>}</section>
+        <section className="conversation-panel" aria-labelledby="conversation-title"><div className="conversation-heading"><h2 id="conversation-title">Chat de la letra</h2><span>{letterChat?.letter ? `${letterChat.letter.bid_count} de ${letterChat.letter.bid_limit} pujas` : 'Sin letra activa'}</span></div>{letterChat?.letter ? <div className="letter-chat"><p className="letter-chat-copy">Elige un texto del diccionario. Tu puja desbloquea su chat personalizado; el texto ganador se revela cuando la letra se resuelve.</p><div className="letter-text-options">{letterChat.texts.map((text) => <article className={text.selected_by_me ? 'letter-text-option selected' : text.is_revealed ? 'letter-text-option revealed' : 'letter-text-option'} key={text.id}><div><small>{text.dictionary_term ? `DICCIONARIO: ${text.dictionary_term}` : 'TEXTO DE CAMPAÑA'}</small><h3>{text.option_label}</h3>{text.text_content ? <p>{text.text_content}</p> : <p className="letter-text-locked">Texto oculto hasta registrar una puja.</p>}<span>{text.bid_count} pujas · {text.message_count} mensajes</span></div>{text.selected_by_me ? <button type="button" onClick={() => loadTextMessages(text.id)}>Abrir mi chat</button> : <button type="button" disabled={bidding || letterChat.letter.tie_pending || letterChat.letter.bid_count >= letterChat.letter.bid_limit} onClick={() => placeTextBid(text.id)}>Pujar por este texto <Icon name="chevron" size={17} /></button>}</article>)}</div>{letterChat.letter.tie_pending && <p className="letter-chat-tie">Las pujas empataron. Un administrador debe seleccionar el texto que continuará la campaña.</p>}{selectedThread && <section className="text-thread"><header><div><small>CHAT PERSONALIZADO</small><h3>{selectedThread.option_label}</h3></div><button type="button" onClick={() => { setSelectedThread(null); setTextMessages([]) }}>Cerrar</button></header><div className="text-thread-messages">{textMessages.length ? textMessages.map((item) => <article key={item.id}><strong>{item.author_name}</strong><p>{item.body}</p><time>{formatTime(item.created_at)}</time></article>) : <p>Este chat aún no tiene mensajes.</p>}</div><form onSubmit={publishTextMessage}><input value={textMessage} maxLength={800} onChange={(event) => setTextMessage(event.target.value)} placeholder="Escribe en tu chat personalizado" aria-label="Escribe en tu chat personalizado" /><button type="submit" disabled={bidding}>Enviar <Icon name="send" size={16} /></button></form></section>}</div> : <p className="workspace-empty">Aún no hay textos configurados para la letra activa.</p>}<div className="conversation-heading work-updates-heading"><h2>Actualizaciones de trabajo</h2><span>{updates.length} publicadas</span></div><div className="post-list" aria-live="polite">{updates.length ? updates.map((update) => <article className="conversation-post" key={update.id}><div className="post-avatar own">{initials(update.author_name)}</div><div className="post-content"><div><strong>{update.author_name}</strong><time>{formatTime(update.created_at)}</time></div><p>{update.body}</p></div></article>) : <p className="workspace-empty">Aún no hay actualizaciones publicadas para esta campaña.</p>}</div>{canPublish ? <form className="message-composer" onSubmit={publishUpdate}><div className="post-avatar own">{initials(user?.name)}</div><div className="composer-box"><textarea value={message} maxLength={500} onChange={(event) => setMessage(event.target.value)} placeholder="Registra tu actualización de trabajo" aria-label="Registra tu actualización de trabajo" /><div><small>{message.length}/500</small><button className="publish-button" disabled={working} type="submit">Enviar actualización <Icon name="send" size={16} /></button></div></div></form> : <p className="workspace-empty">{user ? 'Inicia tu jornada para poder publicar actualizaciones.' : 'Inicia sesión y solicita un turno para registrar actualizaciones.'}</p>}</section>
         <aside className="product-panel" aria-label="Productos oficiales"><div className="product-heading"><h2>Productos oficiales</h2></div><div className="product-copy"><strong>Catálogo en preparación</strong><span>Las poleras y fardos oficiales se publicarán en la tienda cuando estén disponibles.</span></div><a className="product-button" href="/tienda">Ir a la tienda <Icon name="chevron" size={19} /></a></aside>
       </section>
     </section>

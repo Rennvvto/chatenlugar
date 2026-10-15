@@ -55,6 +55,51 @@ CREATE TABLE IF NOT EXISTS campaign_letters (
   UNIQUE (campaign_id, position)
 );
 
+CREATE TABLE IF NOT EXISTS campaign_letter_texts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  campaign_letter_id UUID NOT NULL REFERENCES campaign_letters(id) ON DELETE CASCADE,
+  option_label VARCHAR(120) NOT NULL,
+  text_content VARCHAR(1200) NOT NULL,
+  dictionary_term VARCHAR(100),
+  is_revealed BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (campaign_letter_id, option_label)
+);
+
+ALTER TABLE campaign_letters ADD COLUMN IF NOT EXISTS bid_limit SMALLINT NOT NULL DEFAULT 5;
+ALTER TABLE campaign_letters ADD COLUMN IF NOT EXISTS winning_text_id UUID REFERENCES campaign_letter_texts(id) ON DELETE SET NULL;
+ALTER TABLE campaign_letters ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMPTZ;
+ALTER TABLE campaign_letters ADD COLUMN IF NOT EXISTS tie_pending BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE TABLE IF NOT EXISTS campaign_letter_bids (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  campaign_letter_id UUID NOT NULL REFERENCES campaign_letters(id) ON DELETE CASCADE,
+  campaign_letter_text_id UUID NOT NULL REFERENCES campaign_letter_texts(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (campaign_letter_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS campaign_text_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  campaign_letter_text_id UUID NOT NULL REFERENCES campaign_letter_texts(id) ON DELETE CASCADE,
+  author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  body VARCHAR(800) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS shard_interactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  interaction_type VARCHAR(40) NOT NULL,
+  campaign_id UUID REFERENCES campaigns(id) ON DELETE SET NULL,
+  campaign_letter_id UUID REFERENCES campaign_letters(id) ON DELETE SET NULL,
+  campaign_letter_text_id UUID REFERENCES campaign_letter_texts(id) ON DELETE SET NULL,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS campaign_assignments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   campaign_id UUID NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
@@ -171,6 +216,10 @@ CREATE TABLE IF NOT EXISTS admin_audit_logs (
 );
 
 CREATE INDEX IF NOT EXISTS campaigns_search_idx ON campaigns USING GIN (to_tsvector('spanish', name || ' ' || short_description));
+CREATE INDEX IF NOT EXISTS campaign_letter_texts_letter_idx ON campaign_letter_texts (campaign_letter_id);
+CREATE INDEX IF NOT EXISTS campaign_letter_bids_letter_idx ON campaign_letter_bids (campaign_letter_id, created_at ASC);
+CREATE INDEX IF NOT EXISTS campaign_text_messages_text_idx ON campaign_text_messages (campaign_letter_text_id, created_at ASC);
+CREATE INDEX IF NOT EXISTS shard_interactions_user_created_idx ON shard_interactions (user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS notifications_user_created_idx ON notifications (user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS work_updates_campaign_created_idx ON work_updates (campaign_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS work_update_comments_update_created_idx ON work_update_comments (work_update_id, created_at ASC);

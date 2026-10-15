@@ -23,6 +23,7 @@ const productSchema = z.object({
 })
 const roleSchema = z.object({ role: z.enum(['worker', 'company_admin']) })
 const ruleSchema = z.object({ key: z.string().trim().regex(/^[a-z0-9_.-]{3,80}$/), value: z.record(z.string(), z.unknown()), isActive: z.literal(false).default(false) })
+const letterResolutionSchema = z.object({ textId: z.string().uuid() })
 const orderTransitionSchema = z.object({ status: z.enum(['print_requested', 'in_production', 'shipped', 'delivered', 'cancelled']) })
 const allowedTransitions = {
   paid: ['print_requested', 'cancelled'], print_requested: ['in_production', 'cancelled'], in_production: ['shipped'], shipped: ['delivered'],
@@ -75,6 +76,42 @@ router.patch('/campaigns/:id', async (req, res, next) => {
     await writeAudit({ query }, { actorId: req.auth.sub, action: 'campaign.updated', entityType: 'campaign', entityId: req.params.id, details: { status: data.status } })
     return res.json({ campaign: result.rows[0] })
   } catch (error) { return next(error) }
+})
+router.post('/campaign-letters/:id/resolve', async (req, res, next) => {
+  const client = await pool.connect()
+  try {
+    const { textId } = letterResolutionSchema.parse(req.body)
+    await client.query('BEGIN')
+    const letter = await client.query(
+      `SELECT cl.id, cl.position, cl.tie_pending, c.id AS campaign_id, c.slug
+       FROM campaign_letters cl JOIN campaigns c ON c.id = cl.campaign_id
+       WHERE cl.id = $1 FOR UPDATE OF cl, c`,
+      [req.params.id],
+    )
+    if (!letter.rowCount) {
+      await client.query('ROLLBACK')
+      return res.status(404).json({ error: 'LETTER_NOT_FOUND', message: 'No encontramos esa letra de campaña.' })
+    }
+    if (!letter.rows[0].tie_pending) {
+      await client.query('ROLLBACK')
+      return res.status(409).json({ error: 'LETTER_NOT_PENDING_RESOLUTION', message: 'Esta letra no requiere resolución administrativa.' })
+    }
+    const text = await client.query('SELECT id FROM campaign_letter_texts WHERE id = $1 AND campaign_letter_id = $2', [textId, letter.rows[0].id])
+    if (!text.rowCount) {
+      await client.query('ROLLBACK')
+      return res.status(404).json({ error: 'TEXT_OPTION_NOT_FOUND', message: 'El texto no pertenece a esta letra.' })
+    }
+    await client.query('UPDATE campaign_letter_texts SET is_revealed = TRUE WHERE id = $1', [textId])
+    await client.query(`UPDATE campaign_letters SET status = 'completed', winning_text_id = $1, resolved_at = NOW(), tie_pending = FALSE WHERE id = $2`, [textId, letter.rows[0].id])
+    const next = await client.query(`UPDATE campaign_letters SET status = 'active' WHERE campaign_id = $1 AND position = $2 AND status = 'pending' RETURNING letter`, [letter.rows[0].campaign_id, letter.rows[0].position + 1])
+    await client.query('UPDATE campaigns SET current_letter = $1, updated_at = NOW() WHERE id = $2', [next.rows[0]?.letter || null, letter.rows[0].campaign_id])
+    await writeAudit(client, { actorId: req.auth.sub, action: 'campaign_letter.tie_resolved', entityType: 'campaign_letter', entityId: letter.rows[0].id, details: { text_id: textId } })
+    await client.query('COMMIT')
+    return res.json({ letter: { id: letter.rows[0].id, status: 'completed', winningTextId: textId }, nextLetter: next.rows[0]?.letter || null })
+  } catch (error) {
+    await client.query('ROLLBACK')
+    return next(error)
+  } finally { client.release() }
 })
 router.get('/assignments', async (req,res,next)=>{try{const r=await query(`SELECT a.id,a.target_turn,a.status,a.started_at,a.completed_at,c.name AS campaign_name,u.name AS worker_name,u.handle AS worker_handle FROM campaign_assignments a JOIN campaigns c ON c.id=a.campaign_id JOIN users u ON u.id=a.user_id ORDER BY a.created_at DESC LIMIT 200`);return res.json({assignments:r.rows})}catch(e){return next(e)}})
 router.patch('/assignments/:id/status', async (req,res,next)=>{try{const d=z.object({status:z.enum(['queued','active','completed','cancelled'])}).parse(req.body);const r=await query('UPDATE campaign_assignments SET status=$1, started_at=CASE WHEN $1=\'active\' THEN COALESCE(started_at,NOW()) ELSE started_at END, completed_at=CASE WHEN $1=\'completed\' THEN COALESCE(completed_at,NOW()) ELSE completed_at END WHERE id=$2 RETURNING id,status,user_id',[d.status,req.params.id]);if(!r.rowCount)return res.status(404).json({error:'ASSIGNMENT_NOT_FOUND',message:'No encontramos ese turno.'});await writeAudit({query},{actorId:req.auth.sub,action:'assignment.status_updated',entityType:'assignment',entityId:req.params.id,details:{status:d.status}});return res.json({assignment:r.rows[0]})}catch(e){return next(e)}})
