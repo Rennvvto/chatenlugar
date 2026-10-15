@@ -58,9 +58,10 @@ Habilitar un producto real y ejecutar una compra controlada de bajo monto para v
 
 ## Campañas: letras, textos y pujas
 
-- Estado: implementación en curso en la rama `feat-letter-text-auctions`.
+- Estado: integrado y verificado en producción mediante PR #22 (`cd048fe`).
 - Alcance: textos configurables por letra, una puja por persona y letra, límite predeterminado de cinco pujas, revelación del texto ganador y avance seguro a la siguiente letra.
 - Chat: cada texto seleccionado desbloquea un chat personalizado; las pujas y mensajes quedan registrados como interacciones de esquirlas, sin asignar valores monetarios.
 - Empates: quedan bloqueados para una resolución administrativa auditada; no se aplica un desempate inventado.
 - Reglas: las referencias de 1.000 esquirlas, comisiones de poleras y fardos se guardan como configuración inactiva hasta recibir una fórmula comercial aprobada.
+- Producción: `GET /api/campaigns/hola/letter-chat` responde `200` con la letra H, tres opciones de texto y el límite de cinco pujas.
 - Cuenta administrativa: `Joseamaro22@gmail.com` aún no existe en PostgreSQL. Debe registrarse antes de asignarle el rol de administración.
