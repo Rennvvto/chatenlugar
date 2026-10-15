@@ -20,6 +20,18 @@ CROSS JOIN LATERAL (VALUES ('H', 1), ('O', 2), ('L', 3), ('A', 4)) AS letters(le
 WHERE c.slug = 'hola'
 ON CONFLICT (campaign_id, position) DO NOTHING;
 
+INSERT INTO campaign_letter_texts (campaign_letter_id, option_label, text_content, dictionary_term)
+SELECT cl.id, option_label, text_content, dictionary_term
+FROM campaigns c
+JOIN campaign_letters cl ON cl.campaign_id = c.id AND cl.position = 1
+CROSS JOIN LATERAL (VALUES
+  ('2 + 2 = 3', '2 + 2 = 3', 'tres'),
+  ('2 + 2 = 4', '2 + 2 = 4', 'cuatro'),
+  ('2 + 2 = 5', '2 + 2 = 5', 'cinco')
+) AS options(option_label, text_content, dictionary_term)
+WHERE c.slug = 'hola'
+ON CONFLICT (campaign_letter_id, option_label) DO NOTHING;
+
 INSERT INTO campaign_letters (campaign_id, letter, position, status)
 SELECT c.id, letters.letter, letters.position, CASE WHEN letters.position = 1 THEN 'active'::letter_status ELSE 'pending'::letter_status END
 FROM campaigns c
@@ -33,3 +45,10 @@ FROM campaigns c
 CROSS JOIN LATERAL (VALUES ('H', 1), ('A', 2), ('M', 3), ('B', 4), ('U', 5), ('R', 6), ('G', 7), ('U', 8), ('E', 9), ('S', 10), ('A', 11), ('S', 12)) AS letters(letter, position)
 WHERE c.slug = 'hamburguesas'
 ON CONFLICT (campaign_id, position) DO NOTHING;
+
+INSERT INTO business_rules (key, value, is_active)
+VALUES
+  ('shards.commission_reference', '{"shards":1000,"commission_clp":100,"status":"pending_approval"}'::jsonb, FALSE),
+  ('campaign_letter.bid_limit', '{"default_bids_per_letter":5,"status":"implemented_without_monetary_payout"}'::jsonb, FALSE),
+  ('sales.commission_ranges', '{"themed_shirt_clp":[25000,50000,100000],"shirt_bundle_clp":500000,"status":"pending_approval"}'::jsonb, FALSE)
+ON CONFLICT (key) DO NOTHING;
