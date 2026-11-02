@@ -65,3 +65,14 @@ Habilitar un producto real y ejecutar una compra controlada de bajo monto para v
 - Reglas: las referencias de 1.000 esquirlas, comisiones de poleras y fardos se guardan como configuración inactiva hasta recibir una fórmula comercial aprobada.
 - Producción: `GET /api/campaigns/hola/letter-chat` responde `200` con la letra H, tres opciones de texto y el límite de cinco pujas.
 - Cuenta administrativa: `Joseamaro22@gmail.com` aún no existe en PostgreSQL. Debe registrarse antes de asignarle el rol de administración.
+
+## Frontend según el PDF del CEO (2 de noviembre de 2026)
+
+- Alcance: el frontend anterior se retiró y se reemplazó por las tres pantallas del PDF entregado por el CEO: `/`, `/concepto/:termino` y `/crear-usuario`, en `src/lugar/`. El PDF no se versiona porque este repositorio es público.
+- Regla de trabajo: el frontend sigue literalmente los PDF, en dibujo y en texto, sin mejoras visuales. Lo que el PDF no define queda pendiente de confirmación.
+- Retirado: pantallas de perfil, tienda, pedidos y pago, comunidad, colecciones, notificaciones, administración y espacio de campaña. La API y PostgreSQL siguen activos; esas pantallas vuelven cuando lleguen sus PDF.
+- Límite actual: el PDF no dibuja dónde se ingresan correo y contraseña, por lo que no se puede iniciar sesión ni comprar desde la web.
+- Datos: las campañas y las opciones de tarjeta vienen de la API. Los nodos y las fichas son el ejemplo del PDF: sus campos van vacíos y el ocultamiento de información no está conectado a las compras.
+- Datos iniciales: se agrega la campaña `PIXEL` porque aparece en el PDF.
+- Publicación: el servicio se despliega con `railway up`; fusionar en `main` no publica por sí solo.
+- Dominio: `chatenlugar.cl` sigue sirviendo el sitio PHP anterior hasta mover el DNS.
