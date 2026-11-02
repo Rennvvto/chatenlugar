@@ -1,0 +1,63 @@
+/* Pantallas del diseno en PDF. Las coordenadas se escriben en la escala del marco y --s las ajusta a la ventana. */
+.lg, .lg * { box-sizing: border-box; }
+.lg { --blue: #6bb0e0; position: fixed; inset: 0; overflow: hidden; background: var(--blue); color: #000; font-family: 'PT Sans', Arial, sans-serif; font-weight: 400; letter-spacing: 0; text-rendering: geometricPrecision; }
+.lg button, .lg input { font: inherit; color: inherit; border: 0; background: none; padding: 0; margin: 0; border-radius: 0; }
+.lg button { cursor: pointer; }
+.lg a { color: inherit; text-decoration: none; }
+.lg-frame { position: absolute; inset: 0; border-style: solid; border-color: #000; border-width: calc(63.1px * var(--s)) calc(9.8px * var(--s)) calc(10.4px * var(--s)) calc(10.6px * var(--s)); pointer-events: none; }
+
+.lg-anchor { position: absolute; top: 0; bottom: 0; width: 1132.5px; zoom: var(--s); pointer-events: none; }
+.lg-anchor > *, .lg-anchor a, .lg-anchor button, .lg-anchor input, .lg-anchor label { pointer-events: auto; }
+.lg-anchor-left { left: 0; }
+.lg-anchor-right { right: 0; }
+.lg-anchor-center { left: 50%; margin-left: -566.25px; }
+.lg-anchor-bottom { left: 50%; top: auto; height: 695px; margin-left: -566.25px; }
+
+.lg-abs, .lg-box, .lg-text, .lg-logo, .lg-dot, .lg-chip { position: absolute; display: block; }
+.lg-text { white-space: pre; line-height: normal; font-weight: 400; }
+.lg-bold { font-weight: 700; }
+.lg-stroked { outline-style: solid; outline-color: #000; }
+.lg-dot { border-radius: 50%; background: #000; }
+.lg button.lg-dot { border-radius: 50%; background: #000; }
+.lg-chip { background: #cbcbcb; }
+.lg-hexagon { overflow: visible; }
+
+.lg-brand { position: absolute; left: 36.5px; top: 10.5px; width: 227px; height: 42px; background: #fafdff; }
+.lg-enter { position: absolute; left: 878.7px; top: 22px; width: 56.9px; height: 18.9px; }
+.lg-place { position: absolute; left: 982.5px; top: 13.5px; width: 116px; height: 36px; background: var(--blue); }
+
+.lg-search { position: absolute; width: 557.7px; height: 42.3px; background: #000; border-radius: 21.15px; z-index: 5; }
+.lg-search-field { position: absolute; left: 55.9px; top: -2.5px; width: 504.7px; height: 47.3px; border-radius: 23.65px; background: #fff; border: 5px solid #000; }
+.lg .lg-search-field input { display: block; width: 100%; height: 100%; padding: 5.3px 28px 0 68.77px; font-size: 12.13px; font-weight: 700; outline: 0; }
+.lg-search-field input::placeholder { color: #000; opacity: 1; }
+.lg-suggest { position: absolute; left: 68.4px; top: 40.5px; width: 476px; margin: 0; padding: 8.1px 0 9.5px; list-style: none; background: #fff; outline: 3px solid #000; outline-offset: -1.5px; }
+.lg-suggest li { padding-left: 17.92px; height: 16.8px; }
+.lg .lg-suggest button { display: block; width: 100%; font-size: 14px; line-height: normal; text-align: left; white-space: nowrap; }
+.lg-suggest.is-single { left: 81.2px; top: 42.7px; width: 455.2px; height: 21.4px; padding: 1.9px 0 0; }
+.lg-suggest.is-single li { padding-left: 79.12px; }
+
+.lg-nodes { position: absolute; inset: 0; pointer-events: none; }
+.lg-nodes > * { pointer-events: auto; }
+
+.lg-campaigns { position: absolute; left: 34.5px; top: 63.5px; width: 232px; height: 167px; background: #000; }
+.lg-campaign-list { position: absolute; left: 7px; top: 6px; width: 175px; height: 156px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 4px; }
+.lg-campaign-list::-webkit-scrollbar { display: none; }
+.lg .lg-campaign-list button { position: relative; flex: 0 0 28px; background: #fafdff; }
+.lg .lg-campaign-list button.is-selected { background: var(--blue); }
+.lg-track { position: absolute; left: 201px; top: 6px; width: 11px; height: 156px; background: #fafdff; }
+.lg-thumb { position: absolute; left: 190px; width: 34px; height: 12px; background: var(--blue); }
+
+.lg-deck { position: absolute; left: 177.5px; top: 373.5px; width: 805px; height: 316px; background: #fff; outline: 3px solid #000; outline-offset: -1.5px; }
+
+.lg-feed { position: absolute; left: 141.5px; top: 178px; bottom: 10.4px; width: 870px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+.lg-feed::-webkit-scrollbar { display: none; }
+.lg-feed > .lg-dot { z-index: 2; }
+.lg-feed-list { display: flex; flex-direction: column; gap: 15px; padding-top: 20.7px; }
+.lg-feed-end { height: 1px; }
+.lg-panel { position: relative; flex: none; width: 856px; height: 235px; background: #f2f2f2; overflow: hidden; }
+.lg-rule { position: absolute; left: 32px; width: 192px; height: 1px; background: #000; }
+.lg-shirt { position: absolute; display: block; }
+
+.lg-hex-picker { position: absolute; display: block; background: #63b3ed; outline: 1px solid #000; outline-offset: -.5px; cursor: pointer; }
+.lg-hex-picker i { position: absolute; width: 6.3px; height: 6.3px; }
+.lg .lg-hex-picker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
