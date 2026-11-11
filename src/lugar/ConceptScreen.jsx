@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import LugarShell, { Anchor, Box, Dot, SearchBar, Text, conceptUrl } from './LugarShell'
+import LugarShell, { Anchor, Box, Dot, SearchBar, Text, searchUrl } from './LugarShell'
 import poleraUno from './assets/polera-1.jpg'
 import poleraDos from './assets/polera-2.jpg'
 
@@ -150,7 +150,7 @@ export default function ConceptScreen({ term }) {
           </div>
           <div ref={endRef} className="lg-feed-end" />
         </div>
-        <SearchBar x={281.6} y={88.5} initialValue={term} alwaysOpen onSearch={(next) => window.location.assign(conceptUrl(next))} />
+        <SearchBar x={281.6} y={88.5} initialValue={term} alwaysOpen onSearch={(next) => window.location.assign(searchUrl(next))} />
       </Anchor>
     </LugarShell>
   )

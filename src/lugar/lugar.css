@@ -21,6 +21,8 @@
 .lg button.lg-dot { border-radius: 50%; background: #000; }
 .lg-chip { background: #cbcbcb; }
 .lg-hexagon { overflow: visible; }
+.lg .lg-art { pointer-events: none; }
+.lg button.lg-arrow { position: absolute; display: block; }
 
 .lg-brand { position: absolute; left: 36.5px; top: 10.5px; width: 227px; height: 42px; background: #fafdff; }
 .lg-enter { position: absolute; left: 878.7px; top: 22px; width: 56.9px; height: 18.9px; }
@@ -57,6 +59,10 @@
 .lg-panel { position: relative; flex: none; width: 856px; height: 235px; background: #f2f2f2; overflow: hidden; }
 .lg-rule { position: absolute; left: 32px; width: 192px; height: 1px; background: #000; }
 .lg-shirt { position: absolute; display: block; }
+
+.lg-bars { position: absolute; left: 197.5px; top: 383.5px; width: 222px; height: 170px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 15px; }
+.lg-bars::-webkit-scrollbar { display: none; }
+.lg-bars i { flex: none; height: 22px; }
 
 .lg-hex-picker { position: absolute; display: block; background: #63b3ed; outline: 1px solid #000; outline-offset: -.5px; cursor: pointer; }
 .lg-hex-picker i { position: absolute; width: 6.3px; height: 6.3px; }
