@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { apiRequest, listCampaigns } from '../platform-api'
-import LugarShell, { Anchor, Art, Box, ChipSquares, Dot, SearchBar, Text, Triangle, conceptUrl } from './LugarShell'
-import valorTres from './assets/valor-3.svg'
-import valorCuatro from './assets/valor-4.svg'
-import valorCinco from './assets/valor-5.svg'
-import verBursatil from './assets/ver-bursatil.svg'
+import { listCampaigns } from '../platform-api'
+import LugarShell, { Anchor, Dot, Scene, SearchBar, Text, conceptUrl, searchUrl } from './LugarShell'
+import inicio from './assets/inicio.svg'
+import mapa from './assets/mapa.svg'
 
 // Lista y orden que muestra el diseno. Las campanas nuevas de la API se agregan despues de estas.
 const DESIGN_CAMPAIGNS = [
@@ -14,38 +12,18 @@ const DESIGN_CAMPAIGNS = [
   { slug: 'hamburguesas', label: 'HAMBURGUESA' },
   { slug: 'pixel', label: 'PIXEL' },
 ]
-const SUGGESTED_OPTIONS = ['=3', '=4', '=5']
-const VALUE_ART = { '=3': valorTres, '=4': valorCuatro, '=5': valorCinco }
-const CARDS = [{ x: 27, valueX: 97.9 }, { x: 294.5, valueX: 90.4 }, { x: 562.1, valueX: 90.3 }]
-const PLACE_NODES = [[257.5, 351.5], [323.5, 252.5], [821.5, 347.5], [497.5, 225.5], [536.5, 185.5], [484.5, 308.5], [523.5, 268.5], [742.5, 183.5], [690.5, 306.5], [729.5, 266.5]]
+const PLACE_NODES = [[257.5, 351.5], [323.5, 252.5], [782.5, 387.5], [814.5, 478.5], [821.5, 347.5], [497.5, 225.5], [536.5, 185.5], [484.5, 308.5], [523.5, 268.5], [742.5, 183.5], [690.5, 306.5], [773.5, 278.5]]
 const LIST_HEIGHT = 156
 const THUMB_START = 14
 const THUMB_TRAVEL = 136
 
-const optionResult = (label) => {
-  const index = label.lastIndexOf('=')
-  return index === -1 ? label : `=${label.slice(index + 1).trim()}`
-}
+const search = (term) => window.location.assign(searchUrl(term))
 
-function BlankCard({ x, valueX, option }) {
-  return (
-    <Box x={x} y={38.1} w={223.9} h={264.2} fill="#fff" stroke={3} radius={11.56}>
-      <Box x={28.3} y={7.3} w={168.2} h={16.4} stroke={3} />
-      <Triangle x={106.5} y={10.9} />
-      {VALUE_ART[option]
-        ? <Art src={VALUE_ART[option]} alt={option} x={valueX} y={74.8} w={32.8} h={35.5} />
-        : <Text x={valueX} y={102.9} size={29.6}>{option}</Text>}
-      <Box x={68.5} y={247.8} w={85.7} h={16.1} fill="#63b3ed" stroke={1} />
-      <Art src={verBursatil} alt="VER BURSÁTIL" x={81.4} y={250.3} w={56.3} h={11.7} />
-      <ChipSquares x={145.3} y={250.3} />
-    </Box>
-  )
-}
-
-export default function HomeScreen() {
+// Sin termino es la portada del visitante (solo el buscador). Al buscar o elegir una campana
+// en el buscador se despliegan sobre el mapa los nodos de lugares del concepto instante.
+export default function HomeScreen({ term }) {
   const [apiCampaigns, setApiCampaigns] = useState([])
-  const [selected, setSelected] = useState('hola')
-  const [options, setOptions] = useState(SUGGESTED_OPTIONS)
+  const [selected, setSelected] = useState(() => DESIGN_CAMPAIGNS.find((campaign) => campaign.label === term)?.slug ?? 'hola')
   const [thumb, setThumb] = useState(0)
 
   useEffect(() => {
@@ -53,16 +31,6 @@ export default function HomeScreen() {
     listCampaigns().then(({ campaigns }) => { if (active) setApiCampaigns(campaigns) }).catch(() => {})
     return () => { active = false }
   }, [])
-
-  useEffect(() => {
-    let active = true
-    apiRequest(`/campaigns/${selected}/letter-chat`).then(({ letterChat }) => {
-      if (!active) return
-      const labels = letterChat.texts.map((text) => optionResult(text.option_label))
-      setOptions(labels.length ? labels.slice(0, CARDS.length) : SUGGESTED_OPTIONS)
-    }).catch(() => { if (active) setOptions(SUGGESTED_OPTIONS) })
-    return () => { active = false }
-  }, [selected])
 
   const campaigns = useMemo(() => {
     const known = new Set(DESIGN_CAMPAIGNS.map((campaign) => campaign.slug))
@@ -76,15 +44,29 @@ export default function HomeScreen() {
     setThumb(range > 0 ? scrollTop / range : 0)
   }
 
-  const openConcept = (term = 'CONCEPTO INSTANTE') => window.location.assign(conceptUrl(term))
+  const pickCampaign = (campaign) => search(campaign.label)
+
+  if (!term) {
+    return (
+      <LugarShell>
+        <Anchor side="bottom">
+          <Scene src={inicio} alt="By/AMAROESTUDIO" />
+        </Anchor>
+        <Anchor side="center">
+          <SearchBar x={281.6} y={308.5} campaigns={campaigns} onPickCampaign={pickCampaign} onSearch={search} />
+        </Anchor>
+      </LugarShell>
+    )
+  }
 
   return (
     <LugarShell>
       <Anchor side="center">
+        <Scene src={mapa} alt="Mapamundi" />
         <div className="lg-nodes">
-          {PLACE_NODES.map(([x, y], index) => <Dot key={`${x}-${y}`} x={x} y={y} label={`Lugar ${index + 1}`} onClick={() => openConcept()} />)}
+          {PLACE_NODES.map(([x, y], index) => <Dot key={`${x}-${y}`} x={x} y={y} label={`Lugar ${index + 1}`} onClick={() => window.location.assign(conceptUrl(term))} />)}
         </div>
-        <SearchBar x={281.6} y={81.5} placeholder="DICCIONARIO" alwaysOpen campaigns={campaigns} onPickCampaign={setSelected} onSearch={openConcept} />
+        <SearchBar x={281.6} y={81.5} placeholder={term} alwaysOpen campaigns={campaigns} onPickCampaign={pickCampaign} onSearch={search} />
       </Anchor>
       <Anchor side="left">
         <div className="lg-campaigns">
@@ -96,11 +78,6 @@ export default function HomeScreen() {
           <i className="lg-track" aria-hidden="true" />
           <i className="lg-thumb" aria-hidden="true" style={{ top: THUMB_START + thumb * THUMB_TRAVEL }} />
         </div>
-      </Anchor>
-      <Anchor side="bottom">
-        <section className="lg-deck" aria-label="Tarjetas coleccionables en blanco">
-          {options.map((option, index) => <BlankCard key={CARDS[index].x} x={CARDS[index].x} valueX={CARDS[index].valueX} option={option} />)}
-        </section>
       </Anchor>
     </LugarShell>
   )

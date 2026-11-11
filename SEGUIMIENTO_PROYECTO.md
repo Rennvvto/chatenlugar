@@ -76,3 +76,15 @@ Habilitar un producto real y ejecutar una compra controlada de bajo monto para v
 - Datos iniciales: se agrega la campaña `PIXEL` porque aparece en el PDF.
 - Publicación: el servicio se despliega con `railway up`; fusionar en `main` no publica por sí solo.
 - Dominio: `chatenlugar.cl` sigue sirviendo el sitio PHP anterior hasta mover el DNS.
+
+## Segundo PDF del CEO (10 de noviembre de 2026)
+
+- Alcance: el PDF trae 14 pantallas. La 12 es igual a `/concepto/:termino` y no cambia. Las demás reemplazan o agregan:
+  - `/`: portada del visitante, solo con el buscador y la firma By/AMAROESTUDIO.
+  - `/buscar/:termino`: mapamundi con los nodos de lugares y la lista de campañas. Se llega buscando o eligiendo una campaña en el buscador; cada nodo abre `/concepto/:termino`.
+  - `/crear-usuario` a `/crear-usuario/9`: los nueve pasos que abre INGRESAR, desde SELECCIONAR LUGAR hasta CREAR HEXÁGONO. Las flechas `<` y `>` del panel avanzan y retroceden, y el último paso lleva a `/by/usuario`.
+  - `/by/:usuario`: página del usuario inscrito. Reemplaza el diseño anterior de `/crear-usuario`.
+  - `/usuario`: lista MIS CONCEPTOS INSTANTE y demás. El PDF no dice cómo se llega; por ahora solo se abre con la dirección.
+- Método: cada pantalla tiene una capa SVG generada desde el PDF, con los dibujos y el texto en fuentes con licencia (Sathu, Myriad Pro). El texto en PT Sans queda como texto real. Comparadas con el PDF en un navegador, las 14 pantallas no tienen desplazamiento; las diferencias restantes, de 0,2 % a 1,2 %, son el suavizado de las letras.
+- Notas dentro del dibujo: textos como "ACA PONER TODOS LOS PRODUCTOS...", "DRAG AND DROP" o "SCROLL INFINITO CON CAMPANAS CREADAS" están dentro del marco, así que se muestran tal cual. El scroll infinito de las barras de campañas sí funciona.
+- Pendiente de dibujo: escribir un lugar nuevo, elegir la tarjeta en blanco, arrastrar productos a la tienda, editar y guardar el monto de esquirla, los nodos con letra de sugerencia de `/by/usuario`, el menú MIS ..., las flechas de USUARIO y la pantalla para ingresar correo y contraseña. Los campos siguen vacíos y nada se guarda en la base de datos.

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LOGO_PATH, TRIANGLE_PATH } from './graphics'
+import { LOGO_PATH } from './graphics'
 import ingresarArt from './assets/ingresar.svg'
 import lugarArt from './assets/lugar.svg'
 import './lugar.css'
@@ -11,6 +11,7 @@ const DICTIONARY_LINE = 'DICCIONARIO FARDO ABECEDARIO'
 const PT_SANS_ASCENT = 1.018
 
 export const conceptUrl = (term) => `/concepto/${encodeURIComponent(term.trim().toLocaleUpperCase('es-CL'))}`
+export const searchUrl = (term) => `/buscar/${encodeURIComponent(term.trim().toLocaleUpperCase('es-CL'))}`
 
 const useFrameScale = () => {
   const measure = () => Math.min(window.innerWidth / FRAME_WIDTH, window.innerHeight / FRAME_HEIGHT)
@@ -31,14 +32,6 @@ export function Logo({ color = 'currentColor', x, y, scale = 1 }) {
   )
 }
 
-export function Triangle({ x, y, scale = 1 }) {
-  return (
-    <svg className="lg-abs" style={{ left: x, top: y, width: 12 * scale, height: 10.2 * scale }} viewBox="0 0 12 10.2" aria-hidden="true">
-      <path d={TRIANGLE_PATH} />
-    </svg>
-  )
-}
-
 // x e y son el origen de la linea de texto en el PDF: y es la base de las letras.
 export function Text({ x, y, size, bold, color, children }) {
   return <span className={`lg-text ${bold ? 'lg-bold' : ''}`} style={{ left: x, top: y - PT_SANS_ASCENT * size, fontSize: size, color }}>{children}</span>
@@ -47,6 +40,23 @@ export function Text({ x, y, size, bold, color, children }) {
 // Texto del PDF en fuentes con licencia (Myriad Pro, Sathu): se usa el trazo de las letras como grafico.
 export function Art({ src, alt = '', x, y, w, h }) {
   return <img className="lg-abs" src={src} alt={alt} style={{ left: x, top: y, width: w, height: h }} />
+}
+
+// Capa fija de una pantalla, generada desde el PDF: un SVG del tamano del marco con los dibujos y el texto en fuentes con licencia.
+// Encima van las imagenes [src, x, y, w, h] y el texto PT Sans [x, y, tamano, texto, { bold, color }].
+export function Scene({ src, alt = '', images = [], texts = [] }) {
+  return (
+    <>
+      <img className="lg-abs lg-art" src={src} alt={alt} style={{ left: 0, top: 0, width: FRAME_WIDTH, height: FRAME_HEIGHT }} />
+      {images.map(([image, x, y, w, h]) => <img key={image} className="lg-abs lg-art" src={image} alt="" style={{ left: x, top: y, width: w, height: h }} />)}
+      {texts.map(([x, y, size, text, style]) => <Text key={`${x}-${y}-${text}`} x={x} y={y} size={size} {...style}>{text}</Text>)}
+    </>
+  )
+}
+
+// Boton sobre una flecha < o > dibujada en el PDF; x e y son el origen de la letra.
+export function ArrowButton({ x, y, label, onClick }) {
+  return <button className="lg-arrow" type="button" aria-label={label} style={{ left: x - 5, top: y - 17, width: 21, height: 21 }} onClick={onClick} />
 }
 
 export function Box({ x, y, w, h, fill, stroke = 0, radius, className = '', children }) {
@@ -59,14 +69,6 @@ export function Dot({ x, y, size = 26, onClick, label }) {
   const style = { left: x, top: y, width: size, height: size }
   if (onClick) return <button className="lg-dot" type="button" style={style} aria-label={label} onClick={onClick} />
   return <span className="lg-dot" style={style} aria-hidden="true" />
-}
-
-export function ChipSquares({ x, y, size = 2.3, gap = 0.4, rowGap = 0.7 }) {
-  const step = size + gap
-  const rowStep = size + rowGap
-  return [[0, 0], [step, 0], [0, rowStep], [step, rowStep]].map(([dx, dy]) => (
-    <i className="lg-chip" key={`${dx}-${dy}`} style={{ left: x + dx, top: y + dy, width: size, height: size }} />
-  ))
 }
 
 export function Anchor({ side, className = '', children }) {
@@ -101,7 +103,7 @@ export function SearchBar({ x, y, placeholder = '', initialValue = '', alwaysOpe
       </form>
       {(alwaysOpen || focused) && (
         <ul className={`lg-suggest ${rows === 1 ? 'is-single' : ''}`}>
-          {matches.map((campaign) => <li key={campaign.slug}><button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => { setValue(''); onPickCampaign?.(campaign.slug) }}>{campaign.label}</button></li>)}
+          {matches.map((campaign) => <li key={campaign.slug}><button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => { setValue(''); onPickCampaign?.(campaign) }}>{campaign.label}</button></li>)}
           {suggestions.map((term) => <li key={term}><button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => onSearch(term)}>{term}</button></li>)}
         </ul>
       )}
