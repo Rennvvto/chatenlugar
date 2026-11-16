@@ -1,4 +1,4 @@
-import LugarShell, { Anchor, Scene, SearchBar, Text, searchUrl } from './LugarShell'
+import LugarShell, { Anchor, Scene, SearchBar, Text } from './LugarShell'
 import usuarioBy from './assets/usuario-by.svg'
 
 const TEXTS = [
@@ -73,7 +73,7 @@ export default function UserScreen() {
     <LugarShell>
       <Anchor side="center">
         <Scene src={usuarioBy} alt="Página del usuario" texts={TEXTS} />
-        <SearchBar x={273.6} y={74.5} initialValue="CONCEPTO INSTANTE" onSearch={(term) => window.location.assign(searchUrl(term))} />
+        <SearchBar x={273.6} y={74.5} initialValue="CONCEPTO INSTANTE" />
         <label className="lg-hex-picker" style={{ left: 1066.1, top: 127.2, width: 45.5, height: 19.7 }}>
           <Text x={4.89} y={12.53} size={8.79}>HEX</Text>
           <i style={{ background: '#00d200', left: 26.1, top: 3.6 }} />

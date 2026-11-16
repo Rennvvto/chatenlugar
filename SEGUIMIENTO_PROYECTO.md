@@ -88,3 +88,17 @@ Habilitar un producto real y ejecutar una compra controlada de bajo monto para v
 - Método: cada pantalla tiene una capa SVG generada desde el PDF, con los dibujos y el texto en fuentes con licencia (Sathu, Myriad Pro). El texto en PT Sans queda como texto real. Comparadas con el PDF en un navegador, las 14 pantallas no tienen desplazamiento; las diferencias restantes, de 0,2 % a 1,2 %, son el suavizado de las letras.
 - Notas dentro del dibujo: textos como "ACA PONER TODOS LOS PRODUCTOS...", "DRAG AND DROP" o "SCROLL INFINITO CON CAMPANAS CREADAS" están dentro del marco, así que se muestran tal cual. El scroll infinito de las barras de campañas sí funciona.
 - Pendiente de dibujo: escribir un lugar nuevo, elegir la tarjeta en blanco, arrastrar productos a la tienda, editar y guardar el monto de esquirla, los nodos con letra de sugerencia de `/by/usuario`, el menú MIS ..., las flechas de USUARIO y la pantalla para ingresar correo y contraseña. Los campos siguen vacíos y nada se guarda en la base de datos.
+
+## Tercer PDF del CEO (16 de noviembre de 2026)
+
+- Pantalla de acceso nueva en `/ingresar`, conectada a la API real. INGRESAR inicia sesión y lleva al backoffice (`/usuario`); CREAR USUARIO registra a la persona y abre los pasos de creación. Como el diseño solo pide usuario y contraseña, el usuario es el correo y el nombre se toma de la parte antes de la @. Los errores salen en el globo del navegador sobre el campo, porque el PDF no dibuja mensajes. "OLVIDÓ SU CONTRASEÑA" queda como texto: la API no tiene recuperación de contraseña.
+- `/crear-usuario` y `/usuario` ahora piden sesión; sin sesión llevan a `/ingresar`.
+- Menú de CAMPANAS: se abre y se cierra al apretar CAMPANAS. Muestra PIXEL, SUSHI, PIZZA, HAMBURGUESA y una fila en blanco, como el dibujo; HOLA ya no aparece.
+- Mapa: 10 nodos y un desplegable con los ejemplos dibujados ("SIEMPRE MUESTRA EJEMPLOS GUIADOS POR DICCIONARIO"); al escribir se reemplazan por las sugerencias.
+- Pasos de creación: son 8, porque el PDF quitó el de chat. Cada uno tiene GUARDAR, que guarda lo elegido y sigue al paso siguiente.
+  - Paso 1: el lugar abre LISTADO DE LUGARES e INSCRIBIR LUGAR, hasta 10 lugares.
+  - Paso 3 (UNIVERSOS DE INFORMACIÓN): cada columna tiene scroll infinito.
+  - Paso 7 (esquirla): la persona escribe el monto.
+  - Lo elegido se guarda en la sesión del navegador, porque la API no tiene dónde guardarlo.
+- Concepto: se agrega "AGREGAR A HEXAGONO" y la barra del desplegable. Backoffice: el título se movió como en el dibujo. `/by/usuario` no cambió.
+- Pendiente de definición: qué muestra "TE POSICIONAS ARRIBA Y MUESTRA TEXTO", el espacio publicitario de VER BURSÁTIL, el arrastre de poleras, qué hacen AGREGAR A HEXAGONO y los cuadrados de cada ficha, y dónde se guardan en la API los lugares y el monto.

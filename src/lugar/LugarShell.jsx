@@ -9,6 +9,13 @@ const FRAME_WIDTH = 1132.5
 const FRAME_HEIGHT = 695
 const DICTIONARY_LINE = 'DICCIONARIO FARDO ABECEDARIO'
 const PT_SANS_ASCENT = 1.018
+// Menu de CAMPANAS en el orden del diseno; la ultima fila va en blanco, como esta dibujada.
+const CAMPAIGNS = [
+  { slug: 'pixel', label: 'PIXEL' },
+  { slug: 'sushi', label: 'SUSHI' },
+  { slug: 'pizza', label: 'PIZZA' },
+  { slug: 'hamburguesas', label: 'HAMBURGUESA' },
+]
 
 export const conceptUrl = (term) => `/concepto/${encodeURIComponent(term.trim().toLocaleUpperCase('es-CL'))}`
 export const searchUrl = (term) => `/buscar/${encodeURIComponent(term.trim().toLocaleUpperCase('es-CL'))}`
@@ -54,9 +61,19 @@ export function Scene({ src, alt = '', images = [], texts = [] }) {
   )
 }
 
-// Boton sobre una flecha < o > dibujada en el PDF; x e y son el origen de la letra.
+// Boton transparente sobre algo dibujado en la capa del PDF (una flecha, GUARDAR...).
+export function HitButton({ x, y, w, h, label, onClick, disabled }) {
+  return <button className="lg-hit" type="button" aria-label={label} disabled={disabled} style={{ left: x, top: y, width: w, height: h }} onClick={onClick} />
+}
+
+// Flecha < o > dibujada en el PDF; x e y son el origen de la letra.
 export function ArrowButton({ x, y, label, onClick }) {
-  return <button className="lg-arrow" type="button" aria-label={label} style={{ left: x - 5, top: y - 17, width: 21, height: 21 }} onClick={onClick} />
+  return <HitButton x={x - 5} y={y - 17} w={21} h={21} label={label} onClick={onClick} />
+}
+
+// Palabra en negrita dibujada como boton (GUARDAR); x e y son el origen de la palabra y w su ancho.
+export function WordButton({ x, y, w, label, onClick }) {
+  return <HitButton x={x - 4} y={y - 13} w={w + 8} h={17} label={label} onClick={onClick} />
 }
 
 export function Box({ x, y, w, h, fill, stroke = 0, radius, className = '', children }) {
@@ -75,7 +92,11 @@ export function Anchor({ side, className = '', children }) {
   return <div className={`lg-anchor lg-anchor-${side} ${className}`}>{children}</div>
 }
 
-export function SearchBar({ x, y, placeholder = '', initialValue = '', alwaysOpen = false, campaigns = [], onPickCampaign, onSearch }) {
+const goSearch = (term) => window.location.assign(searchUrl(term))
+
+// examples: filas de ejemplo que muestra el desplegable mientras la persona no escribe { box: [x, y, w, h], rows: [[texto, x, y]] }.
+// scrollbar: barra de desplazamiento dibujada al costado del desplegable de tres filas.
+export function SearchBar({ x, y, placeholder = '', initialValue = '', alwaysOpen = false, examples, scrollbar = false, onSearch = goSearch }) {
   const [value, setValue] = useState(initialValue)
   const [focused, setFocused] = useState(false)
   const typed = value.trim().toLocaleUpperCase('es-CL')
@@ -85,8 +106,9 @@ export function SearchBar({ x, y, placeholder = '', initialValue = '', alwaysOpe
     const prefixes = words.map((_, index) => words.slice(0, index + 1).join(' ')).filter((term) => term !== DICTIONARY_LINE)
     return [...new Set([...prefixes, DICTIONARY_LINE])]
   }, [typed])
-  const matches = typed ? campaigns.filter((campaign) => campaign.label.includes(typed)) : []
+  const matches = typed ? CAMPAIGNS.filter((campaign) => campaign.label.includes(typed)) : []
   const rows = matches.length + suggestions.length
+  const showExamples = examples && !typed
 
   return (
     <div className="lg-search" style={{ left: x, top: y }}>
@@ -101,31 +123,61 @@ export function SearchBar({ x, y, placeholder = '', initialValue = '', alwaysOpe
           onChange={(event) => setValue(event.target.value.toLocaleUpperCase('es-CL'))}
         />
       </form>
-      {(alwaysOpen || focused) && (
+      {(alwaysOpen || focused) && showExamples && (
+        <Box x={examples.box[0]} y={examples.box[1]} w={examples.box[2]} h={examples.box[3]} fill="#fff" stroke={3}>
+          {examples.rows.map(([text, rowX, rowY]) => <Text key={text} x={rowX} y={rowY} size={14}>{text}</Text>)}
+        </Box>
+      )}
+      {(alwaysOpen || focused) && !showExamples && (
         <ul className={`lg-suggest ${rows === 1 ? 'is-single' : ''}`}>
-          {matches.map((campaign) => <li key={campaign.slug}><button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => { setValue(''); onPickCampaign?.(campaign) }}>{campaign.label}</button></li>)}
+          {matches.map((campaign) => <li key={campaign.slug}><button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => onSearch(campaign.label)}>{campaign.label}</button></li>)}
           {suggestions.map((term) => <li key={term}><button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => onSearch(term)}>{term}</button></li>)}
         </ul>
+      )}
+      {(alwaysOpen || focused) && !showExamples && scrollbar && rows === 3 && (
+        <>
+          <i className="lg-suggest-track" aria-hidden="true" />
+          <i className="lg-suggest-thumb" aria-hidden="true" />
+        </>
       )}
     </div>
   )
 }
 
-export default function LugarShell({ children }) {
+// Menu de CAMPANAS: aparece desde la izquierda cada vez que se hace click en CAMPANAS.
+function CampaignMenu() {
+  const [selected, setSelected] = useState(CAMPAIGNS[0].slug)
+  return (
+    <div className="lg-campaigns">
+      <div className="lg-campaign-list">
+        {CAMPAIGNS.map((campaign) => (
+          <button key={campaign.slug} type="button" className={campaign.slug === selected ? 'is-selected' : ''} aria-pressed={campaign.slug === selected} onClick={() => setSelected(campaign.slug)}><Text x={23.77} y={18.29} size={12.13} bold>{campaign.label}</Text></button>
+        ))}
+        <i aria-hidden="true" />
+      </div>
+      <i className="lg-track" aria-hidden="true" />
+      <i className="lg-thumb" aria-hidden="true" />
+    </div>
+  )
+}
+
+export default function LugarShell({ campaignsOpen = false, children }) {
   const scale = useFrameScale()
+  const [menuOpen, setMenuOpen] = useState(campaignsOpen)
 
   return (
     <main className="lg" style={{ '--s': scale }}>
       <div className="lg-frame" aria-hidden="true" />
       {children}
       <Anchor side="left">
-        <a className="lg-brand" href="/">
+        {menuOpen && <CampaignMenu />}
+        <button className="lg-brand" type="button" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
           <Logo color="#000a11" x={24.3} y={8} />
           <Text x={65.77} y={27.29} size={12.13} bold>CAMPANAS</Text>
-        </a>
+        </button>
       </Anchor>
       <Anchor side="right">
-        <a className="lg-enter" href="/crear-usuario"><Art src={ingresarArt} alt="INGRESAR" x={0} y={0} w={56.9} h={18.9} /></a>
+        <a className="lg-enter" href="/ingresar"><Art src={ingresarArt} alt="INGRESAR" x={0} y={0} w={56.9} h={18.9} /></a>
         <span className="lg-place"><Art src={lugarArt} alt="LUGAR" x={11.2} y={8.5} w={39} h={18.9} /></span>
       </Anchor>
     </main>
