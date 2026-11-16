@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import LugarShell, { Anchor, Box, Dot, SearchBar, Text, searchUrl } from './LugarShell'
+import LugarShell, { Anchor, Box, Dot, SearchBar, Text } from './LugarShell'
 import poleraUno from './assets/polera-1.jpg'
 import poleraDos from './assets/polera-2.jpg'
 
@@ -102,6 +102,7 @@ function OwnedPanel({ term }) {
       <Box x={385.5} y={41} w={226.5} h={30} fill="#ff0303" />
       <Text x={411.41} y={62.9} size={8.23} color="#fff">TRANSACCIONES  :  TRASPASOS  :  TRANSFERENCIAS</Text>
       {lines(OWNED_MARKET, MARKET_X, 8)}
+      <Text x={MARKET_X} y={229.22} size={8} bold>AGREGAR A HEXAGONO</Text>
       <img className="lg-shirt" src={poleraUno} alt="" style={{ left: 666, top: 14.8, width: 160.1, height: 210.8 }} />
     </article>
   )
@@ -118,6 +119,8 @@ function LockedPanel({ term, image }) {
       {lines(WEB_LINES, WEB_X, 7.55)}
       <Text x={326.64} y={61.28} size={17.86}>COMPRAR  /  PERÍODO DE ESTADÍA</Text>
       {lines(LOCKED_MARKET, MARKET_X, 9.07)}
+      <Text x={MARKET_X} y={223.49} size={9.07}>A</Text>
+      <Text x={416.98} y={223.49} size={9.07} bold>GREGAR A HEXAGONO</Text>
       {REDACTIONS.map(([x, y, w]) => <Box key={y} x={x} y={y} w={w} h={8.6} fill="#000" />)}
       <img className="lg-shirt" src={image} alt="" style={{ left: 662, top: 11.8, width: 164, height: 215.9 }} />
     </article>
@@ -150,7 +153,7 @@ export default function ConceptScreen({ term }) {
           </div>
           <div ref={endRef} className="lg-feed-end" />
         </div>
-        <SearchBar x={281.6} y={88.5} initialValue={term} alwaysOpen onSearch={(next) => window.location.assign(searchUrl(next))} />
+        <SearchBar x={281.6} y={88.5} initialValue={term} alwaysOpen scrollbar />
       </Anchor>
     </LugarShell>
   )

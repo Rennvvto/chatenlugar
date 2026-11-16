@@ -22,9 +22,10 @@
 .lg-chip { background: #cbcbcb; }
 .lg-hexagon { overflow: visible; }
 .lg .lg-art { pointer-events: none; }
-.lg button.lg-arrow { position: absolute; display: block; }
+.lg button.lg-hit { position: absolute; display: block; }
+.lg button.lg-hit:disabled { cursor: default; }
 
-.lg-brand { position: absolute; left: 36.5px; top: 10.5px; width: 227px; height: 42px; background: #fafdff; }
+.lg button.lg-brand { position: absolute; left: 36.5px; top: 10.5px; width: 227px; height: 42px; background: #fafdff; }
 .lg-enter { position: absolute; left: 878.7px; top: 22px; width: 56.9px; height: 18.9px; }
 .lg-place { position: absolute; left: 982.5px; top: 13.5px; width: 116px; height: 36px; background: var(--blue); }
 
@@ -37,19 +38,19 @@
 .lg .lg-suggest button { display: block; width: 100%; font-size: 14px; line-height: normal; text-align: left; white-space: nowrap; }
 .lg-suggest.is-single { left: 81.2px; top: 42.7px; width: 455.2px; height: 21.4px; padding: 1.9px 0 0; }
 .lg-suggest.is-single li { padding-left: 79.12px; }
+.lg-suggest-track { position: absolute; left: 514.9px; top: 42px; width: 11px; height: 66px; background: #000; }
+.lg-suggest-thumb { position: absolute; left: 503.9px; top: 65px; width: 34px; height: 12px; background: var(--blue); }
 
 .lg-nodes { position: absolute; inset: 0; pointer-events: none; }
 .lg-nodes > * { pointer-events: auto; }
 
-.lg-campaigns { position: absolute; left: 34.5px; top: 63.5px; width: 232px; height: 167px; background: #000; }
+.lg-campaigns { position: absolute; left: 34.5px; top: 63.5px; width: 232px; height: 179px; background: #000; }
 .lg-campaign-list { position: absolute; left: 7px; top: 6px; width: 175px; height: 156px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 4px; }
 .lg-campaign-list::-webkit-scrollbar { display: none; }
-.lg .lg-campaign-list button { position: relative; flex: 0 0 28px; background: #fafdff; }
+.lg .lg-campaign-list button, .lg-campaign-list > i { position: relative; flex: 0 0 28px; background: #fafdff; }
 .lg .lg-campaign-list button.is-selected { background: var(--blue); }
 .lg-track { position: absolute; left: 201px; top: 6px; width: 11px; height: 156px; background: #fafdff; }
-.lg-thumb { position: absolute; left: 190px; width: 34px; height: 12px; background: var(--blue); }
-
-.lg-deck { position: absolute; left: 177.5px; top: 373.5px; width: 805px; height: 316px; background: #fff; outline: 3px solid #000; outline-offset: -1.5px; }
+.lg-thumb { position: absolute; left: 190px; top: 75px; width: 34px; height: 12px; background: var(--blue); }
 
 .lg-feed { position: absolute; left: 141.5px; top: 178px; bottom: 10.4px; width: 870px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .lg-feed::-webkit-scrollbar { display: none; }
@@ -60,10 +61,16 @@
 .lg-rule { position: absolute; left: 32px; width: 192px; height: 1px; background: #000; }
 .lg-shirt { position: absolute; display: block; }
 
-.lg-bars { position: absolute; left: 197.5px; top: 383.5px; width: 222px; height: 170px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 15px; }
+.lg-bars { position: absolute; width: 222px; height: 170px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 15px; }
 .lg-bars::-webkit-scrollbar { display: none; }
 .lg-bars i { flex: none; height: 22px; }
 
 .lg-hex-picker { position: absolute; display: block; background: #63b3ed; outline: 1px solid #000; outline-offset: -.5px; cursor: pointer; }
 .lg-hex-picker i { position: absolute; width: 6.3px; height: 6.3px; }
 .lg .lg-hex-picker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
+.lg .lg-access-input { position: absolute; left: 475px; width: 255px; height: 34px; font-size: 14px; outline: 0; }
+.lg-places { position: absolute; left: 208.5px; top: 229.5px; width: 427px; z-index: 4; }
+.lg .lg-places input { position: absolute; left: 7.3px; top: 3.5px; width: 380px; height: 22px; font-size: 17px; text-transform: uppercase; outline: 0; }
+.lg .lg-amount { position: absolute; left: 386.6px; top: 394.72px; width: 390px; font-size: 51.36px; font-weight: 700; line-height: normal; outline: 0; }
+.lg-amount::placeholder { color: #000; opacity: 1; }
