@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { LOGO_PATH } from './graphics'
 import ingresarArt from './assets/ingresar.svg'
 import lugarArt from './assets/lugar.svg'
@@ -62,8 +62,8 @@ export function Scene({ src, alt = '', images = [], texts = [] }) {
 }
 
 // Boton transparente sobre algo dibujado en la capa del PDF (una flecha, GUARDAR...).
-export function HitButton({ x, y, w, h, label, onClick, disabled }) {
-  return <button className="lg-hit" type="button" aria-label={label} disabled={disabled} style={{ left: x, top: y, width: w, height: h }} onClick={onClick} />
+export function HitButton({ x, y, w, h, label, ...props }) {
+  return <button className="lg-hit" type="button" aria-label={label} style={{ left: x, top: y, width: w, height: h }} {...props} />
 }
 
 // Flecha < o > dibujada en el PDF; x e y son el origen de la letra.
@@ -144,19 +144,43 @@ export function SearchBar({ x, y, placeholder = '', initialValue = '', alwaysOpe
   )
 }
 
-// Menu de CAMPANAS: aparece desde la izquierda cada vez que se hace click en CAMPANAS.
+// Deslizador celeste del menu: se mueve de arriba a abajo por el riel. Parte donde esta dibujado; desde ahi hacia abajo
+// recorre la lista, para mostrar las campanas afines y sugerencias por diccionario que vayan quedando bajo las filas visibles.
+const THUMB_TOP = 6
+const THUMB_REST = 75
+const THUMB_BOTTOM = 150
+
 function CampaignMenu() {
   const [selected, setSelected] = useState(CAMPAIGNS[0].slug)
+  const [thumbTop, setThumbTop] = useState(THUMB_REST)
+  const listRef = useRef(null)
+  const dragRef = useRef(null)
+
+  const startDrag = (event) => {
+    event.currentTarget.setPointerCapture(event.pointerId)
+    // Con zoom, el puntero se mide en pixeles de pantalla: el alto real del deslizador da la escala.
+    dragRef.current = { startY: event.clientY, startTop: thumbTop, scale: event.currentTarget.getBoundingClientRect().height / 12 }
+  }
+
+  const drag = (event) => {
+    if (!dragRef.current) return
+    const { startY, startTop, scale } = dragRef.current
+    const top = Math.min(Math.max(startTop + (event.clientY - startY) / scale, THUMB_TOP), THUMB_BOTTOM)
+    setThumbTop(top)
+    const list = listRef.current
+    list.scrollTop = Math.max(0, (top - THUMB_REST) / (THUMB_BOTTOM - THUMB_REST)) * (list.scrollHeight - list.clientHeight)
+  }
+
   return (
     <div className="lg-campaigns">
-      <div className="lg-campaign-list">
+      <div className="lg-campaign-list" ref={listRef}>
         {CAMPAIGNS.map((campaign) => (
           <button key={campaign.slug} type="button" className={campaign.slug === selected ? 'is-selected' : ''} aria-pressed={campaign.slug === selected} onClick={() => setSelected(campaign.slug)}><Text x={23.77} y={18.29} size={12.13} bold>{campaign.label}</Text></button>
         ))}
         <i aria-hidden="true" />
       </div>
       <i className="lg-track" aria-hidden="true" />
-      <i className="lg-thumb" aria-hidden="true" />
+      <i className="lg-thumb" role="slider" aria-label="Deslizador de campañas" aria-valuemin={THUMB_TOP} aria-valuemax={THUMB_BOTTOM} aria-valuenow={Math.round(thumbTop)} style={{ top: thumbTop }} onPointerDown={startDrag} onPointerMove={drag} onPointerUp={() => { dragRef.current = null }} onPointerCancel={() => { dragRef.current = null }} />
     </div>
   )
 }

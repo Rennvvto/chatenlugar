@@ -102,3 +102,19 @@ Habilitar un producto real y ejecutar una compra controlada de bajo monto para v
   - Lo elegido se guarda en la sesión del navegador, porque la API no tiene dónde guardarlo.
 - Concepto: se agrega "AGREGAR A HEXAGONO" y la barra del desplegable. Backoffice: el título se movió como en el dibujo. `/by/usuario` no cambió.
 - Pendiente de definición: qué muestra "TE POSICIONAS ARRIBA Y MUESTRA TEXTO", el espacio publicitario de VER BURSÁTIL, el arrastre de poleras, qué hacen AGREGAR A HEXAGONO y los cuadrados de cada ficha, y dónde se guardan en la API los lugares y el monto.
+
+## Cuarto PDF del CEO (23 de noviembre de 2026)
+
+- El PDF (`asd.pdf`) trae 18 páginas.
+  - 13 iguales al tercero, salvo notas.
+  - Un paso nuevo: BILLETE : MERCADO.
+  - Textos dentro de las barras de UNIVERSOS DE INFORMACIÓN.
+  - Cuatro variantes del backoffice.
+- Pasos de creación: ahora son 9. El paso 7 es "CREAR ESQUIRLA – BILLETE : MERCADO", con los billetes de 1, 2, 5, 10 y 20, y el monto pasa al paso 8.
+- INGRESAR con éxito ahora lleva a los pasos (`/crear-usuario`), como dice la nota del PDF; antes llevaba al backoffice. CREAR USUARIO sigue igual.
+- Menú de CAMPANAS: el deslizador celeste se arrastra de arriba a abajo y, desde donde está dibujado hacia abajo, recorre la lista. Las "campañas afines y sugerencias por diccionario" que debería mostrar todavía no existen como datos.
+- Backoffice:
+  - Cada opción del menú se marca con la barra negra al seleccionarla o con el puntero encima. Las cuatro primeras siguen la barra dibujada; las demás, la misma posición que la cuarta.
+  - Todas muestran "MAYOR INFORMACIÓN EN LA SEGUNDA FASE", como el dibujo.
+  - La primera opción ahora dice "CONCEPTOS INSTANTE".
+- Pendiente de definición: qué hace elegir un billete, qué muestra cada opción del backoffice en la segunda fase, y de dónde salen las campañas afines del deslizador.
