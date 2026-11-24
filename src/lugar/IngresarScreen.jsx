@@ -7,6 +7,7 @@ import pasoUniversos from './assets/paso-universos.svg'
 import pasoFardo from './assets/paso-fardo.svg'
 import pasoTienda from './assets/paso-tienda.svg'
 import pasoCampana from './assets/paso-campana.svg'
+import pasoBillete from './assets/paso-billete.svg'
 import pasoEsquirla from './assets/paso-esquirla.svg'
 import pasoHexagono from './assets/paso-hexagono.svg'
 import tarjetaUno from './assets/tarjeta-coleccionable-1.png'
@@ -25,6 +26,16 @@ const PRODUCTS_NOTE = ['ACA PONER TODOS', 'LOS PRODUCTOS QUE', 'SON POLERAS TEMA
 const ARROWS = { back: [186.8, 577.65], next: [935.8, 577.65] }
 const BLACK_BARS = ['#000', '#000', '#000', '#000', '#000']
 const CAMPAIGN_BARS = ['#000', '#000', '#afafaf', '#000', '#000']
+// Textos escritos dentro de las barras de UNIVERSOS DE INFORMACION, en la posicion dibujada: [x, y de la base, texto, color].
+const UNIVERSE_LABELS = [
+  [21.11, 18.81, 'TE POSICIONAS ARRIBA Y MUESTR', '#fff'],
+  [220.87, 18.81, 'A', '#000'],
+  [21.11, 34.96, 'TEXTO\\', '#000'],
+  [21.11, 51.12, 'CADA CONJUNTO DE TEXTOS', '#fff'],
+  [21.11, 83.42, 'CADA RECTANGULO ES UNA CAMPA', '#fff'],
+  [21.11, 131.88, 'TEXTO O CONCEPTO INSTANTE', '#fff'],
+]
+const ALSO_LABELS = [18.81, 50.81, 86.81, 126.82, 162.82].map((y) => [16.11, y, 'TAMBIEN', '#fff'])
 
 // Un paso por pagina del PDF, en el orden de la lista tabulada (>SELECCIONAR LUGAR ... >CREAR HEXAGONO).
 // save es la palabra GUARDAR dibujada en el panel: [x, y, ancho].
@@ -42,7 +53,7 @@ const STEPS = [
     art: pasoUniversos,
     alt: 'Universos de información',
     texts: [SELECTED_CARDS, ...cardColumns(502.74)],
-    bars: [[197.5, 318.5, BLACK_BARS], [460.5, 318.5, BLACK_BARS], [722.5, 318.5, BLACK_BARS]],
+    bars: [[197.5, 318.5, BLACK_BARS, UNIVERSE_LABELS], [460.5, 318.5, BLACK_BARS, ALSO_LABELS], [722.5, 318.5, BLACK_BARS]],
     back: [169.8, 581.65],
     next: [918.8, 581.65],
     save: [795.05, 581.35, 56.2],
@@ -63,6 +74,14 @@ const STEPS = [
     texts: [SELECTED_CARDS, ...noteLines(244.8, 535.64, ['SCROLL INFINITO CON', 'CAMPANAS CREADAS']), ...noteLines(801.8, 394.65, PRODUCTS_NOTE), [486.3, 360.15, 13.46, 'DRAG AND DROP']],
     bars: [[197.5, 348.5, CAMPAIGN_BARS]],
     save: [795.05, 569.35, 42.91],
+    ...ARROWS,
+  },
+  {
+    art: pasoBillete,
+    alt: 'Crear esquirla: billete y mercado',
+    texts: [SELECTED_CARDS, [204.4, 367.61, 15.36, '=X']],
+    openSearch: true,
+    save: [795.05, 576.35, 42.91],
     ...ARROWS,
   },
   {
@@ -159,8 +178,8 @@ function PlacePicker() {
 }
 
 // Cada conjunto de textos o de campanas es una columna con scroll infinito; cada barra es un texto con su informacion oculta.
-// Parte con dos tandas para que haya algo que desplazar; se ven las mismas cinco del diseno.
-function Bars({ x, y, colors }) {
+// Parte con dos tandas para que haya algo que desplazar; se ven las mismas cinco del diseno. labels se desplaza junto a las barras.
+function Bars({ x, y, colors, labels = [] }) {
   const [count, setCount] = useState(colors.length * 2)
   const listRef = useRef(null)
   const endRef = useRef(null)
@@ -176,6 +195,7 @@ function Bars({ x, y, colors }) {
   return (
     <div className="lg-bars" ref={listRef} style={{ left: x, top: y }}>
       {Array.from({ length: count }, (_, index) => <i key={index} style={{ background: colors[index % colors.length] }} />)}
+      {labels.map(([labelX, labelY, text, color]) => <Text key={`${labelX}-${labelY}`} x={labelX} y={labelY} size={13.46} color={color}>{text}</Text>)}
       <div ref={endRef} className="lg-feed-end" />
     </div>
   )
@@ -210,7 +230,7 @@ export default function IngresarScreen() {
       <Anchor side="center">
         <Scene key={step} src={current.art} alt={current.alt} images={current.images} texts={current.texts} />
         {current.places && <PlacePicker />}
-        {current.bars?.map(([x, y, colors]) => <Bars key={`${step}-${x}`} x={x} y={y} colors={colors} />)}
+        {current.bars?.map(([x, y, colors, labels]) => <Bars key={`${step}-${x}`} x={x} y={y} colors={colors} labels={labels} />)}
         {current.amount && (
           <>
             <input className="lg-amount" inputMode="numeric" placeholder="999.666.666.666" aria-label="Monto para minado" value={amount} onChange={(event) => setAmount(formatAmount(event.target.value))} />

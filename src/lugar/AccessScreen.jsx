@@ -12,7 +12,7 @@ const nameFromEmail = (email) => {
   return (local.length >= 2 ? local : email).slice(0, 80)
 }
 
-// Acceso de usuario nuevo o ya inscrito: INGRESAR inicia sesion y lleva al backoffice; CREAR USUARIO registra y abre los pasos.
+// Acceso de usuario nuevo o ya inscrito: INGRESAR inicia sesion y CREAR USUARIO registra; los dos llevan a los pasos de creacion.
 // Los avisos de error usan el globo del navegador sobre el campo, porque el diseno no dibuja mensajes.
 export default function AccessScreen() {
   const emailRef = useRef(null)
@@ -33,13 +33,9 @@ export default function AccessScreen() {
     if (creating && password.value.length < MIN_PASSWORD) return warn(password, `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.`)
     setBusy(true)
     try {
-      if (creating) {
-        await register({ name: nameFromEmail(email.value), email: email.value, password: password.value })
-        window.location.assign('/crear-usuario')
-      } else {
-        await login({ email: email.value, password: password.value })
-        window.location.assign('/usuario')
-      }
+      if (creating) await register({ name: nameFromEmail(email.value), email: email.value, password: password.value })
+      else await login({ email: email.value, password: password.value })
+      window.location.assign('/crear-usuario')
     } catch (error) {
       warn(email, error.message)
       setBusy(false)

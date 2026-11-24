@@ -50,7 +50,7 @@
 .lg .lg-campaign-list button, .lg-campaign-list > i { position: relative; flex: 0 0 28px; background: #fafdff; }
 .lg .lg-campaign-list button.is-selected { background: var(--blue); }
 .lg-track { position: absolute; left: 201px; top: 6px; width: 11px; height: 156px; background: #fafdff; }
-.lg-thumb { position: absolute; left: 190px; top: 75px; width: 34px; height: 12px; background: var(--blue); }
+.lg-thumb { position: absolute; left: 190px; width: 34px; height: 12px; background: var(--blue); cursor: grab; touch-action: none; }
 
 .lg-feed { position: absolute; left: 141.5px; top: 178px; bottom: 10.4px; width: 870px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
 .lg-feed::-webkit-scrollbar { display: none; }
@@ -61,9 +61,10 @@
 .lg-rule { position: absolute; left: 32px; width: 192px; height: 1px; background: #000; }
 .lg-shirt { position: absolute; display: block; }
 
-.lg-bars { position: absolute; width: 222px; height: 170px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 15px; }
+.lg-bars { position: absolute; width: 240px; height: 170px; overflow-x: hidden; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 15px; }
 .lg-bars::-webkit-scrollbar { display: none; }
-.lg-bars i { flex: none; height: 22px; }
+.lg-bars i { flex: none; width: 222px; height: 22px; }
+.lg-invert { position: absolute; background: #fff; mix-blend-mode: difference; pointer-events: none; }
 
 .lg-hex-picker { position: absolute; display: block; background: #63b3ed; outline: 1px solid #000; outline-offset: -.5px; cursor: pointer; }
 .lg-hex-picker i { position: absolute; width: 6.3px; height: 6.3px; }
